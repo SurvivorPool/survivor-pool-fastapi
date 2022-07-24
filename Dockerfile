@@ -1,4 +1,4 @@
-FROM python:3
+FROM --platform=linux/amd64 python:3
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.txt requirements.txt
