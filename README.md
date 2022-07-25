@@ -1,5 +1,5 @@
 # survivor-pool-fastapi
 
-install docker desktop
-docker-compose build
+install docker desktop </br>
+docker-compose build </br>
 docker-compose up
