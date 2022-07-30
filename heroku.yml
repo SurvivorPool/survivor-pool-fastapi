@@ -5,4 +5,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web: bash -c "uvicorn main:app --host 0.0.0.0 --port ${PORT} --reload"
+  web: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port ${PORT}"
