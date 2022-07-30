@@ -25,5 +25,5 @@ app.include_router(graphql_app, prefix="/graphql")
 async def root():
     return {"message": "Hello World!"}
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=os.environ["PORT"])
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="0.0.0.0", port=os.environ["PORT"])
