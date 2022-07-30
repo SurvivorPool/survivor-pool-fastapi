@@ -25,4 +25,4 @@ app.include_router(graphql_app, prefix="/graphql")
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World!"}
+    return {"message": "Hello World!!!!"}
