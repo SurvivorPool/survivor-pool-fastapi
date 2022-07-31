@@ -17,7 +17,7 @@ class AdminMessage(Base):
     show = Column(Boolean, default=True)
     type = Column(String)
 
-    user = relationship("user")
+    user = relationship("User")
 
 
 class Game(Base):
@@ -34,9 +34,9 @@ class Game(Base):
     week = Column(Integer)
     stadium_id = Column(UUID(as_uuid=True), ForeignKey("stadium.id"), nullable=False)
 
-    home_team_info = relationship("nfl_team", foreign_keys=[home_team_name])
-    away_team_info = relationship("nfl_team", foreign_keys=[away_team_name])
-    stadium_info = relationship("stadium")
+    home_team_info = relationship("NFLTeam", foreign_keys=[home_team_name])
+    away_team_info = relationship("NFLTeam", foreign_keys=[away_team_name])
+    stadium_info = relationship("Stadium")
 
 
 class League(Base):
@@ -50,8 +50,8 @@ class League(Base):
     type_id = Column(UUID(as_uuid=True), ForeignKey("league_type.id"),
                      default=LeagueTypes.Standard.value, nullable=False)
 
-    league_type = relationship("league_type")
-    teams = relationship("player_team", order_by="desc(player_team.is_active), desc(player_team.streak)")
+    league_type = relationship("LeagueType")
+    teams = relationship("PlayerTeam", order_by="desc(PlayerTeam.active), desc(PlayerTeam.streak)")
 
 
 class LeagueType(Base):
@@ -86,9 +86,9 @@ class Pick(Base):
     week_num = Column(Integer, nullable=False)
     nfl_team_name = Column(String, ForeignKey("nfl_team.nickname"), nullable=False)
 
-    player_team = relationship("player_team")
-    game = relationship("game")
-    nfl_team_info = relationship("nfl_team")
+    player_team = relationship("PlayerTeam")
+    game = relationship("Game")
+    nfl_team_info = relationship("NFLTeam")
 
 
 class PlayerTeam(Base):
@@ -101,8 +101,8 @@ class PlayerTeam(Base):
     paid = Column(Boolean, default=False)
     streak = Column(Integer, default=0, server_default='0', nullable=False)
 
-    user = relationship("user")
-    league = relationship("league")
+    user = relationship("User", back_populates="teams")
+    league = relationship("League", back_populates="teams")
 
 
 class Stadium(Base):
@@ -124,7 +124,7 @@ class User(Base):
     receive_notifications = Column(Boolean)
     wins = Column(Integer)
 
-    teams = relationship("player_team")
+    teams = relationship("PlayerTeam")
 
 
 class UserMessage(Base):
@@ -137,5 +137,5 @@ class UserMessage(Base):
     read_date = Column(DateTime(timezone=True))
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), default=uuid.uuid4, nullable=False)
 
-    message_type = relationship("message_type")
-    user = relationship("user")
+    message_type = relationship("MessageType")
+    user = relationship("User")
