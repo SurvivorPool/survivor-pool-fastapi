@@ -1,5 +1,4 @@
-import os, sys
-import uvicorn
+import os
 from fastapi_sqlalchemy import DBSessionMiddleware, db
 import strawberry
 from fastapi import FastAPI
