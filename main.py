@@ -4,6 +4,7 @@ import strawberry
 from fastapi import FastAPI
 from strawberry.fastapi import GraphQLRouter
 from dotenv import load_dotenv
+from starlette.middleware.sessions import SessionMiddleware
 
 from routers import auth
 
@@ -23,6 +24,7 @@ graphql_app = GraphQLRouter(schema)
 
 app = FastAPI()
 app.add_middleware(DBSessionMiddleware, db_url=os.environ["DATABASE_URL"])
+app.add_middleware(SessionMiddleware, secret_key=os.environ["SECRET_KEY"])
 app.include_router(graphql_app, prefix="/graphql", tags=["graphql"])
 app.include_router(auth.router)
 
