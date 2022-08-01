@@ -1,17 +1,16 @@
-import os
+from typing import Optional
+
 from fastapi import APIRouter
-from fastapi_sso.sso.google import GoogleSSO
 from fastapi_sqlalchemy import db
-from starlette.requests import Request
+from pydantic import BaseModel, constr, Field
 from dotenv import load_dotenv
-from models import User
 
 import json
-from fastapi import FastAPI
 from starlette.config import Config
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
+from models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -55,14 +54,57 @@ async def google_callback(request: Request):
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as error:
         return HTMLResponse(f'<h1>{error.error}</h1>')
-    user = token.get('userinfo')
-    if user:
-        request.session['user'] = dict(user)
-    return RedirectResponse(url='/auth')
+    response_user = UserInfoResponse.parse_obj(token.get('userinfo'))
+    login_response = LoginResponse.parse_obj(token)
+    provider = "google"
+    if response_user:
+        user_model = db.session.query(User).filter_by(email=response_user.email, provider=provider).first()
+        if user_model is None:
+            user_create = User(
+                full_name=response_user.given_name,
+                email=response_user.email,
+                is_admin=False,
+                picture_url=response_user.picture,
+                receive_notifications=True,
+                wins=0,
+                provider=provider
+            )
+            db.session.add(user_create)
+            db.session.commit()
+            user_model = db.session.query(User).filter_by(email=response_user.email).first()
+        request.session['user'] = dict(response_user)
+    login_response.id = user_model.id
+    return login_response
 
 
 @router.get('/logout')
 async def logout(request: Request):
     request.session.pop('user', None)
     return RedirectResponse(url='/auth')
+
+
+class UserInfoResponse(BaseModel):
+    iss: str
+    azp: str
+    aud: str
+    sub: str
+    email: str
+    email_verified: bool
+    at_hash: str
+    nonce: str
+    name: str
+    picture: str
+    given_name: str
+    family_name: str
+    locale: str
+    iat: float
+    exp: float
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: float
+    user_info: UserInfoResponse = Field(alias="userinfo")
+    id: Optional[str] = None
 

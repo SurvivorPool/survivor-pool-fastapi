@@ -123,6 +123,7 @@ class User(Base):
     picture_url = Column(String)
     receive_notifications = Column(Boolean)
     wins = Column(Integer)
+    provider = Column(String, nullable=False, default="google")
 
     teams = relationship("PlayerTeam")
 
