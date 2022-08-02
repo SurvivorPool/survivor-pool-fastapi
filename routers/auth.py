@@ -17,15 +17,16 @@ from models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+load_dotenv(".env")
+config = Config('.env')
+oauth = OAuth(config)
+
 SECRET_KEY = os.environ["SECRET_KEY"]
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/google/callback')
 
-load_dotenv(".env")
-config = Config('.env')
-oauth = OAuth(config)
 
 oauth.register(
     name='google',
