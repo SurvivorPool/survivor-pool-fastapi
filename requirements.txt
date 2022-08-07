@@ -39,6 +39,7 @@ sniffio==1.2.0
 SQLAlchemy==1.4.39
 starlette==0.19.1
 strawberry-graphql==0.121.0
+tenacity==8.0.1
 typing_extensions==4.3.0
 uvicorn==0.18.2
 uvloop==0.16.0

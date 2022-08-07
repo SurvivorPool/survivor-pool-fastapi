@@ -1,10 +1,8 @@
 import os
 import json
-from typing import Optional
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi_sqlalchemy import db
-from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from starlette.config import Config
 from starlette.requests import Request
@@ -12,7 +10,10 @@ from starlette.responses import HTMLResponse, RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from models import User
+from models.user import User
+from schemas.user import UserCreate, UserResponse
+import crud
+import dependencies
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -37,12 +38,12 @@ oauth.register(
 )
 
 
-def get_user(email: str, provider: str):
-    user = db.session.query(User).filter_by(email=email, provider=provider).first()
+def get_user(db: Session, email: str, provider: str):
+    user = crud.user.get_by_email_and_provider(db=db, email=email, provider=provider)
     return user
 
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(dependencies.get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -56,7 +57,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = get_user(email=email, provider=provider)
+    user = get_user(db=db, email=email, provider=provider)
     if user is None:
         raise credentials_exception
     return user
@@ -93,29 +94,27 @@ async def google_login(request: Request):
 
 
 @router.get("/google/callback")
-async def google_callback(request: Request):
+async def google_callback(request: Request, db: Session = Depends(dependencies.get_db)):
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as error:
         return HTMLResponse(f'<h1>{error.error}</h1>')
-    response_user: UserInfoResponse = UserInfoResponse.parse_obj(token.get('userinfo'))
+    user_info = token.get('userinfo')
     provider = "google"
-    if response_user:
-        user_model: User = db.session.query(User).filter_by(email=response_user.email, provider=provider).first()
+    if user_info:
+        user_model: User = crud.user.get_by_email_and_provider(db, email=user_info.email, provider=provider)
         if user_model is None:
-            user_create = User(
-                full_name=response_user.given_name,
-                email=response_user.email,
+            user_create = UserCreate(
+                full_name=user_info.given_name,
+                email=user_info.email,
                 is_admin=False,
-                picture_url=response_user.picture,
+                picture_url=user_info.picture,
                 receive_notifications=True,
                 wins=0,
                 provider=provider
             )
-            db.session.add(user_create)
-            db.session.commit()
-            user_model = db.session.query(User).filter_by(email=response_user.email).first()
-        request.session['user'] = dict(response_user)
+            crud.user.create(db, obj_in=user_create)
+            user_model = crud.user.get_by_email_and_provider(db, email=user_info.email, provider=provider)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -135,33 +134,7 @@ async def logout(request: Request):
     return RedirectResponse(url='/auth')
 
 
-@router.get('/test')
+@router.get('/test', response_model=UserResponse)
 async def test(current_user: User = Depends(get_current_user)):
     return current_user
-
-
-class UserInfoResponse(BaseModel):
-    iss: str
-    azp: str
-    aud: str
-    sub: str
-    email: str
-    email_verified: bool
-    at_hash: str
-    nonce: str
-    name: str
-    picture: str
-    given_name: str
-    family_name: str
-    locale: str
-    iat: float
-    exp: float
-
-
-class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
-    expires_in: float
-    user_info: UserInfoResponse = Field(alias="userinfo")
-    id: Optional[str] = None
 
