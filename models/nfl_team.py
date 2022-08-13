@@ -10,6 +10,6 @@ class NFLTeam(Base):
     city_state = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     nickname = Column(String, unique=True, nullable=False)
-    conference = Column(String, nullable=False)
-    division = Column(String, nullable=False)
+    conference = Column(String, nullable=False, server_default="", default="")
+    division = Column(String, nullable=False, server_default="", default="")
 

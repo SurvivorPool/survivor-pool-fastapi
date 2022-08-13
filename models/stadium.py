@@ -9,4 +9,3 @@ class Stadium(Base):
     city = Column(String, nullable=False)
     name = Column(String, nullable=False)
     state = Column(String, nullable=False)
-    roof_type = Column(String, nullable=False)
