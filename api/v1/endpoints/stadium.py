@@ -17,10 +17,7 @@ async def stadiums(db: Session = Depends(dependencies.get_db)):
     response_stadiums = []
     for stadium in stadium_models:
         response_stadium = StadiumResponse(
-            id=stadium.id,
-            city=stadium.city,
-            name=stadium.name,
-            state=stadium.state
+            **stadium.__dict__
         )
         response_stadiums.append(response_stadium)
     response = StadiumList(stadiums=response_stadiums)
