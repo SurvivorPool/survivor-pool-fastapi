@@ -41,7 +41,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('nickname')
     )
-    op.create_table('stadium',
+    op.create_table('stadium.py',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('city', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
@@ -144,7 +144,7 @@ def downgrade() -> None:
     op.drop_table('game')
     op.drop_table('adminmessage')
     op.drop_table('user')
-    op.drop_table('stadium')
+    op.drop_table('stadium.py')
     op.drop_table('nflteam')
     op.drop_table('messagetype')
     op.drop_table('leaguetype')
