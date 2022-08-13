@@ -4,17 +4,14 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-import os, sys
-from dotenv import load_dotenv
+from core.config import settings
+from db.base import Base
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(BASE_DIR, ".env"))
-sys.path.append(BASE_DIR)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+config.set_main_option("sqlalchemy.url", settings.SQLALCHEMY_DATABASE_URI)
 
 
 # Interpret the config file for Python logging.
@@ -26,8 +23,6 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from db.base import Base
-from db.session import SQLALCHEMY_DATABASE_URI
 
 target_metadata = Base.metadata
 
@@ -38,7 +33,7 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    return SQLALCHEMY_DATABASE_URI
+    return settings.SQLALCHEMY_DATABASE_URI
 
 
 def run_migrations_offline() -> None:
