@@ -1,4 +1,5 @@
 import httpx
+from httpx import Response
 from sqlalchemy.orm import Session
 from typing import List
 import crud
@@ -9,8 +10,10 @@ from schemas.nfl_team import NFLTeamCreate
 class NFLTeamService:
     nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
 
-    async def get_nfl_teams(self, db: Session) -> List[NFLTeam]:
-        rss_feed = httpx.get(self.nfl_endpoint)
+    async def update_nfl_teams(self, db: Session, rss_feed: Response = None) -> List[NFLTeam]:
+        if rss_feed is None:
+            rss_feed = httpx.get(self.nfl_endpoint)
+
         json = rss_feed.json()
 
         events = json['events']
@@ -26,43 +29,32 @@ class NFLTeamService:
             away_team_model = crud.nfl_team.get(db, away_team['id'])
 
             if not home_team_model:
-                home_info = home_team['team']
-                nickname = ''
-                if 'name' not in home_info:
-                    nickname = home_info['displayName']
-                else:
-                    nickname = home_info['name']
-
-                home_create = NFLTeamCreate(
-                    id=home_team['id'],
-                    abbreviation=home_info['abbreviation'],
-                    city_state=home_info['location'],
-                    full_name=home_info['displayName'],
-                    nickname=nickname
-                )
-
-                crud.nfl_team.create(db, obj_in=home_create)
-
+                self.add_team(db, home_team)
 
             if not away_team_model:
-                away_info = away_team['team']
-                nickname = ''
-                if 'name' not in away_info:
-                    nickname = away_info['displayName']
-                else:
-                    nickname = away_info['name']
+                self.add_team(db, away_team)
 
-                home_create = NFLTeamCreate(
-                    id=away_team['id'],
-                    abbreviation=away_info['abbreviation'],
-                    city_state=away_info['location'],
-                    full_name=away_info['displayName'],
-                    nickname=nickname
-                )
-
-                crud.nfl_team.create(db, obj_in=home_create)
+    def get_teams(self, db: Session):
         teams = crud.nfl_team.get_multi(db=db)
         return teams
+
+    def add_team(self, db: Session, team: dict):
+        team_info = team['team']
+        nickname = ''
+        if 'name' not in team_info:
+            nickname = team_info['displayName']
+        else:
+            nickname = team_info['name']
+
+        team_create = NFLTeamCreate(
+            id=team['id'],
+            abbreviation=team_info['abbreviation'],
+            city_state=team_info['location'],
+            full_name=team_info['displayName'],
+            nickname=nickname
+        )
+
+        crud.nfl_team.create(db, obj_in=team_create)
 
 
 nfl_team_service = NFLTeamService()

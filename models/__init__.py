@@ -3,6 +3,7 @@ from .game import Game
 from .league import League
 from .league_type import LeagueType
 from .message_type import MessageType
+from .odds import Odds
 from .nfl_team import NFLTeam
 from .pick import Pick
 from .player_team import PlayerTeam

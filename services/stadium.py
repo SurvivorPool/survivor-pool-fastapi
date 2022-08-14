@@ -1,4 +1,5 @@
 import httpx
+from httpx import Response
 from sqlalchemy.orm import Session
 
 import crud
@@ -8,8 +9,10 @@ from schemas.stadium import StadiumCreate
 class StadiumService:
     nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
 
-    async def update_stadiums(self, db: Session):
-        rss_feed = httpx.get(self.nfl_endpoint)
+    async def update_stadiums(self, db: Session, rss_feed: Response = None):
+        if rss_feed is None:
+            rss_feed = httpx.get(self.nfl_endpoint)
+
         json = rss_feed.json()
 
         events = json['events']

@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from api import dependencies
-from typing import List
-from models import NFLTeam
 from services.nfl_team import nfl_team_service
 from schemas.nfl_team import NFLTeamResponse, NFLTeamList
 
@@ -15,7 +13,8 @@ authorized_router = APIRouter(
 
 @authorized_router.get('/', response_model=NFLTeamList)
 async def nfl_teams(db: Session = Depends(dependencies.get_db)):
-    nfl_team_models = await nfl_team_service.get_nfl_teams(db)
+    await nfl_team_service.update_nfl_teams(db)
+    nfl_team_models = nfl_team_service.get_teams(db)
     response_nfl_teams = []
     for nfl_team in nfl_team_models:
         response_nfl_team = NFLTeamResponse(**nfl_team.__dict__)
