@@ -3,9 +3,11 @@ from sqlalchemy.orm import Session
 
 from api import dependencies
 from services.game import game_service
-from services.odds import odds
+from services.odds import odds_service
+from services.stadium import stadium_service
 from schemas.game import GameResponse, GameList
 from schemas.odds import OddsResponse
+from schemas.stadium import StadiumResponse
 
 authorized_router = APIRouter(
     prefix='/games',
@@ -22,9 +24,12 @@ async def games(db: Session = Depends(dependencies.get_db)):
     game_responses = []
     for game in game_models:
         game_response = GameResponse(**game.__dict__)
-        odds_model = odds.get_by_id(db, game.id)
+        odds_model = odds_service.get_by_id(db, game.id)
         if odds_model:
             game_response.odds = OddsResponse(**odds_model.__dict__)
+        stadium_model = stadium_service.get_stadium_by_id(db, game.stadium_id)
+        if stadium_model:
+            game_response.stadium = StadiumResponse(**stadium_model.__dict__)
 
         game_responses.append(game_response)
     games_response = GameList(games=game_responses)

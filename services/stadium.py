@@ -36,6 +36,9 @@ class StadiumService:
     def get_stadiums(self, db: Session):
         return crud.stadium.get_multi(db=db)
 
+    def get_stadium_by_id(selfself, db: Session, stadium_id: int):
+        return crud.stadium.get(db, stadium_id)
+
 
 
 

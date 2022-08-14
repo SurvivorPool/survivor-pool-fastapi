@@ -7,4 +7,4 @@ class OddsService:
         return crud.odds.get(db, odds_id)
 
 
-odds = OddsService()
+odds_service = OddsService()

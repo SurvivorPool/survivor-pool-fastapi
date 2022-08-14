@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
 from schemas.odds import OddsResponse
+from schemas.stadium import StadiumResponse
 
 
 class GameBase(BaseModel):
@@ -40,6 +41,7 @@ class GameInDBBase(GameBase):
 
 class GameResponse(GameInDBBase):
     odds: Optional[OddsResponse]
+    stadium: Optional[StadiumResponse]
 
 
 class GameList(BaseModel):
