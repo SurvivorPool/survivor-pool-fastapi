@@ -16,7 +16,7 @@ authorized_router = APIRouter(
 )
 
 
-@authorized_router.get('/')
+@authorized_router.get('/', response_model=GameList)
 async def games(db: Session = Depends(dependencies.get_db)):
     await game_service.update_games(db)
     game_models = game_service.get_games(db)
