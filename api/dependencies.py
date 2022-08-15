@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from core.config import settings
 import crud
+from models import User
 
 from db.session import SessionLocal
 
@@ -20,7 +21,7 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -38,3 +39,14 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
+
+
+def get_admin_user(current_user=Depends(get_current_user)):
+    forbidden_exception = HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="User is not an admin",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    if not current_user.is_admin:
+        raise forbidden_exception
+    return current_user

@@ -5,7 +5,7 @@ from api import dependencies
 from services.game import game_service
 from services.odds import odds_service
 from services.stadium import stadium_service
-from schemas.game import GameResponse, GameList
+from schemas.game import GameResponseFull, GameList
 from schemas.odds import OddsResponse
 from schemas.stadium import StadiumResponse
 
@@ -23,7 +23,7 @@ async def games(db: Session = Depends(dependencies.get_db)):
 
     game_responses = []
     for game in game_models:
-        game_response = GameResponse(**game.__dict__)
+        game_response = GameResponseFull(**game.__dict__)
         odds_model = odds_service.get_by_id(db, game.id)
         if odds_model:
             game_response.odds = OddsResponse(**odds_model.__dict__)

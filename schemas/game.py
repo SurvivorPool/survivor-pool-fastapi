@@ -40,9 +40,13 @@ class GameInDBBase(GameBase):
 
 
 class GameResponse(GameInDBBase):
+    ...
+
+
+class GameResponseFull(GameInDBBase):
     odds: Optional[OddsResponse]
-    stadium: Optional[StadiumResponse]
+    stadium: StadiumResponse
 
 
 class GameList(BaseModel):
-    games: List[GameResponse]
+    games: List[GameResponseFull]
