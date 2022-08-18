@@ -22,14 +22,25 @@ async def games(db: Session = Depends(dependencies.get_db)):
     game_models = game_service.get_games(db)
 
     game_responses = []
-    for game in game_models:
-        game_response = GameResponseFull(**game.__dict__)
-        odds_model = odds_service.get_by_id(db, game.id)
-        if odds_model:
-            game_response.odds = OddsResponse(**odds_model.__dict__)
-        stadium_model = stadium_service.get_stadium_by_id(db, game.stadium_id)
-        if stadium_model:
-            game_response.stadium = StadiumResponse(**stadium_model.__dict__)
+    for game_model in game_models:
+        odds_model = odds_service.get_by_id(db, game_model.id)
+        stadium_model = stadium_service.get_stadium_by_id(db, game_model.stadium_id)
+
+        game_response = GameResponseFull(
+            id=game_model.id,
+            home_team_name=game_model.home_team_name,
+            home_team_score=game_model.home_team_score,
+            away_team_name=game_model.away_team_name,
+            away_team_score=game_model.away_team_score,
+            day_of_week=game_model.day_of_week,
+            game_date=game_model.game_date,
+            quarter=game_model.quarter,
+            quarter_time=game_model.quarter_time,
+            week=game_model.week,
+            stadium_id=game_model.stadium_id,
+            odds=odds_model,
+            stadium=stadium_model
+        )
 
         game_responses.append(game_response)
     games_response = GameList(games=game_responses)
