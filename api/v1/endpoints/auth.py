@@ -19,15 +19,17 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 config = Config('.env')
 oauth = OAuth(config)
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 120
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 
 oauth.register(
     name='google',
     server_metadata_url=CONF_URL,
     client_kwargs={
-        'scope': 'openid email profile'
-    }
+        'scope': 'openid email profile',
+        'access_type': 'offline',
+        'prompt': 'consent',
+    },
 )
 
 
@@ -38,6 +40,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
+    print(to_encode)
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
@@ -58,7 +61,7 @@ async def homepage(request: Request):
 @router.get("/google/login")
 async def google_login(request: Request):
     redirect_uri = request.url_for('google_callback')
-    return await oauth.google.authorize_redirect(request, redirect_uri)
+    return await oauth.google.authorize_redirect(request, redirect_uri, access_type="offline")
 
 
 @router.get("/google/callback")
@@ -68,6 +71,7 @@ async def google_callback(request: Request, db: Session = Depends(dependencies.g
     except OAuthError as error:
         return HTMLResponse(f'<h1>{error.error}</h1>')
     user_info = token.get('userinfo')
+    refresh_token = token.get('refresh_token')
     provider = "google"
     if user_info:
         user_model: User = crud.user.get_by_email_and_provider(db, email=user_info.email, provider=provider)
@@ -93,7 +97,11 @@ async def google_callback(request: Request, db: Session = Depends(dependencies.g
     access_token = create_access_token(
         data={"sub": user_model.email, "provider": provider}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer"
+            }
 
 
 @router.get('/logout')
