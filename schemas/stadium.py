@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 
 class StadiumBase(BaseModel):
@@ -27,4 +26,4 @@ class StadiumResponse(StadiumInDBBase):
 
 
 class StadiumList(BaseModel):
-    stadiums: List[StadiumResponse]
+    stadiums: list[StadiumResponse]

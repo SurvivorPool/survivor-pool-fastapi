@@ -1,9 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
 from uuid import UUID
-from schemas.league_type import LeagueTypeResponse
-from models.league import League
-from models.league_type import LeagueType
 
 
 class LeagueBase(BaseModel):
@@ -38,7 +34,7 @@ class LeagueResponse(LeagueInDBBase):
 
 
 class LeagueList(BaseModel):
-    leagues: List[LeagueResponse]
+    leagues: list[LeagueResponse]
 
 
 

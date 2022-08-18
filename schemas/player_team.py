@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List, Optional
 from uuid import UUID
 from schemas.user import UserResponse
 from schemas.league import LeagueResponse
@@ -20,6 +19,11 @@ class PlayerTeamCreate(BaseModel):
     name: str
 
 
+class AdminPlayerTeamUpdate(BaseModel):
+    active: bool
+    paid: bool
+
+
 class PlayerTeamUpdate(BaseModel):
     name: str
 
@@ -38,4 +42,4 @@ class PlayerTeamResponseFull(PlayerTeamResponse):
 
 
 class PlayerTeamList(BaseModel):
-    player_teams: List[PlayerTeamResponse]
+    teams: list[PlayerTeamResponse]

@@ -12,15 +12,16 @@ class UserBase(BaseModel):
     wins: int
 
 
+class UserExistsCheckResponse(BaseModel):
+    exists: bool
+
+
 class UserCreate(UserBase):
     ...
 
 
 class UserUpdate(BaseModel):
-    is_admin: bool
-    picture_url: HttpUrl
     receive_notifications: bool
-    wins: int
 
 
 # Properties shared by models stored in DB
@@ -34,6 +35,3 @@ class UserInDBBase(UserBase):
 # Properties to return to client
 class UserResponse(UserInDBBase):
     ...
-
-
-

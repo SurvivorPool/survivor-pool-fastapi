@@ -7,6 +7,9 @@ import crud
 
 
 class PlayerTeamService:
+    def get_all(self, db):
+        return crud.player_team.get_multi(db)
+
     def get_player_teams_by_league_id(self, db: Session, league_id: UUID):
         return crud.player_team.get_by_league_id(db, league_id)
 
@@ -41,6 +44,15 @@ class PlayerTeamService:
 
         player_team_update_model = crud.player_team.update(db, db_obj=player_team_model, obj_in=player_team_input)
         return player_team_update_model
+
+    def delete(self, db: Session, player_team_id: UUID):
+        player_team_model = self.get_by_id(db, player_team_id)
+
+        if not player_team_model:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player team not found")
+
+        player_team_model = crud.player_team.remove(db, id=player_team_id)
+        return player_team_model
 
 
 

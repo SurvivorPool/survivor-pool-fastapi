@@ -1,7 +1,6 @@
 import httpx
 from httpx import Response
 from sqlalchemy.orm import Session
-from typing import List
 import crud
 from models.nfl_team import NFLTeam
 from schemas.nfl_team import NFLTeamCreate
@@ -10,7 +9,7 @@ from schemas.nfl_team import NFLTeamCreate
 class NFLTeamService:
     nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
 
-    async def update_nfl_teams(self, db: Session, rss_feed: Response = None) -> List[NFLTeam]:
+    async def update_nfl_teams(self, db: Session, rss_feed: Response = None) -> list[NFLTeam]:
         if rss_feed is None:
             rss_feed = httpx.get(self.nfl_endpoint)
 

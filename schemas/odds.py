@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 
 class OddsBase(BaseModel):
@@ -27,6 +26,6 @@ class OddsResponse(OddsInDBBase):
 
 
 class OddsList(BaseModel):
-    odds: List[OddsResponse]
+    odds: list[OddsResponse]
 
 

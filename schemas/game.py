@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 from schemas.odds import OddsResponse
 from schemas.stadium import StadiumResponse
@@ -49,4 +49,4 @@ class GameResponseFull(GameInDBBase):
 
 
 class GameList(BaseModel):
-    games: List[GameResponseFull]
+    games: list[GameResponseFull]

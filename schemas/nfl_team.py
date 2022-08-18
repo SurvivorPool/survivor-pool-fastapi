@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 
 
 class NFLTeamBase(BaseModel):
@@ -30,4 +30,4 @@ class NFLTeamResponse(NFLTeamInDBBase):
 
 
 class NFLTeamList(BaseModel):
-    nfl_teams: List[NFLTeamResponse]
+    nfl_teams: list[NFLTeamResponse]

@@ -9,9 +9,9 @@ from authlib.integrations.starlette_client import OAuth, OAuthError
 from jose import JWTError, jwt
 from models.user import User
 from schemas.user import UserCreate, UserResponse
-import crud
 from api import dependencies
 from core.config import settings
+from services.user import user_service
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -74,7 +74,7 @@ async def google_callback(request: Request, db: Session = Depends(dependencies.g
     refresh_token = token.get('refresh_token')
     provider = "google"
     if user_info:
-        user_model: User = crud.user.get_by_email_and_provider(db, email=user_info.email, provider=provider)
+        user_model: User = user_service.get_by_email_and_provider(db, email=user_info.email, provider=provider)
         if user_model is None:
             user_create = UserCreate(
                 full_name=user_info.given_name,
@@ -85,8 +85,8 @@ async def google_callback(request: Request, db: Session = Depends(dependencies.g
                 wins=0,
                 provider=provider
             )
-            crud.user.create(db, obj_in=user_create)
-            user_model = crud.user.get_by_email_and_provider(db, email=user_info.email, provider=provider)
+            user_service.create(db, user_create)
+            user_model = user_service.get_by_email_and_provider(db, email=user_info.email, provider=provider)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

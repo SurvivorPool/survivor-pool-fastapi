@@ -4,8 +4,8 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from core.config import settings
-import crud
 from models import User
+from services.user import user_service
 
 from db.session import SessionLocal
 
@@ -35,7 +35,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = crud.user.get_by_email_and_provider(db=db, email=email, provider=provider)
+    user = user_service.get_by_email_and_provider(db=db, email=email, provider=provider)
     if user is None:
         raise credentials_exception
     return user
