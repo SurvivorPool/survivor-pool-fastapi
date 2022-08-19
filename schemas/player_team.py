@@ -31,6 +31,9 @@ class PlayerTeamUpdate(BaseModel):
 class PlayerTeamInDBBase(PlayerTeamBase):
     id: UUID
 
+    class Config:
+        orm_mode = True
+
 
 class PlayerTeamResponse(PlayerTeamInDBBase):
     ...

@@ -144,7 +144,7 @@ def downgrade() -> None:
     op.drop_table('game')
     op.drop_table('adminmessage')
     op.drop_table('user')
-    op.drop_table('stadium.py')
+    op.drop_table('stadium')
     op.drop_table('nflteam')
     op.drop_table('messagetype')
     op.drop_table('leaguetype')

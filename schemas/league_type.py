@@ -17,7 +17,8 @@ class LeagueTypeUpdate(LeagueTypeBase):
 
 
 class LeagueTypeInDBBase(LeagueTypeBase):
-    ...
+    class Config:
+        orm_mode = True
 
 
 class LeagueTypeResponse(LeagueTypeBase):
