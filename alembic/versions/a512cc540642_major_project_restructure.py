@@ -41,7 +41,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('nickname')
     )
-    op.create_table('stadium.py',
+    op.create_table('stadium',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('city', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
