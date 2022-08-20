@@ -12,6 +12,6 @@ class Pick(Base):
     week_num = Column(Integer, nullable=False)
     nfl_team_name = Column(String, ForeignKey("nflteam.nickname"), nullable=False)
 
-    player_team = relationship("PlayerTeam")
+    player_team = relationship("PlayerTeam", back_populates="picks")
     game = relationship("Game")
     nfl_team_info = relationship("NFLTeam")

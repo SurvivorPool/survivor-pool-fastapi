@@ -33,6 +33,9 @@ class NFLTeamService:
             if not away_team_model:
                 self.add_team(db, away_team)
 
+    def get_team_by_nickname(self, db: Session, nickname: str):
+        return crud.nfl_team.get_team_by_nickname(db, nickname)
+
     def get_teams(self, db: Session):
         teams = crud.nfl_team.get_multi(db=db)
         return teams

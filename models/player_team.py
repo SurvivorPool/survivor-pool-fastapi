@@ -16,3 +16,4 @@ class PlayerTeam(Base):
 
     user = relationship("User", back_populates="teams")
     league = relationship("League", back_populates="teams")
+    picks = relationship("Pick")

@@ -4,6 +4,8 @@ import crud
 from datetime import timedelta
 from dateutil import parser
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
+from models.game import Game
 from schemas.game import GameCreate, GameUpdate
 from schemas.odds import OddsCreate, OddsUpdate
 from services.stadium import stadium_service
@@ -12,6 +14,10 @@ from services.nfl_team import nfl_team_service
 
 class GameService:
     nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
+
+    def get_by_id(self, db, game_id: int) -> Game:
+        return crud.game.get(db, game_id)
+
 
     async def update_games(self, db: Session):
         rss_feed = httpx.get(self.nfl_endpoint)
@@ -115,6 +121,10 @@ class GameService:
 
     def get_games(self, db: Session):
         return crud.game.get_multi(db=db)
+
+    def get_max_week(self, db: Session):
+        return db.query(func.max(Game.week)).scalar()
+
 
 
 

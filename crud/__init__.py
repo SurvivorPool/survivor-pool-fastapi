@@ -4,6 +4,7 @@ from .crud_league_type import league_type
 from .crud_message_type import message_type
 from .crud_nfl_team import nfl_team
 from .crud_odds import odds
+from .crud_pick import pick
 from .crud_player_team import player_team
 from .crud_stadium import stadium
 from .crud_user import user

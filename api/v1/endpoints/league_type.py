@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api import dependencies
 from schemas.league_type import LeagueTypeCreate, LeagueTypeUpdate, LeagueTypeResponse, LeagueTypeList
-from services.league_type_service import league_type_service
+from services.league_type import league_type_service
 
 admin_router = APIRouter(
     prefix='/admin/league_types',

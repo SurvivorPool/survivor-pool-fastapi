@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy.orm import Session
 import crud
-from schemas.league import LeagueCreate, LeagueUpdate
+from schemas.league import  LeagueCreate, LeagueUpdate
 
 
 class LeagueService:
