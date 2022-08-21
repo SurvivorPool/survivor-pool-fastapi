@@ -36,17 +36,15 @@ def advance_week(db: Session = Depends(dependencies.get_db)):
     for player_team_model in player_team_models:
         pick_model = pick_service.get_player_team_pick_for_week(db, player_team_model.id, week_num)
         if not pick_model:
-            # deactivated_team = player_team_service.deactivate_team(db, player_team_model)
+            deactivated_team = player_team_service.deactivate_team(db, player_team_model)
             deactivated_teams.append(player_team_model)
         else:
             if pick_model and pick_model.nfl_team_name in losers:
-                # deactivated_team = player_team_service.deactivate_team(db, player_team_model)
+                deactivated_team = player_team_service.deactivate_team(db, player_team_model)
                 deactivated_teams.append(player_team_model)
             else:
-                # advancing_team = player_team_service.increase_streak(db, player_team_model)
+                advancing_team = player_team_service.increase_streak(db, player_team_model)
                 advancing_teams.append(player_team_model)
-
-    print(deactivated_teams)
 
     advance_week_response = AdvanceWeekResponse(
         deactivated_teams=[PlayerTeamResponse(
