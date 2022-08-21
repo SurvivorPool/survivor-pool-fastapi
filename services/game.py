@@ -119,11 +119,17 @@ class GameService:
                         )
                         crud.odds.update(db, db_obj=odds_model, obj_in=odds_update)
 
-    def get_games(self, db: Session):
+    def get_games(self, db: Session) -> list[Game]:
         return crud.game.get_multi(db=db)
 
-    def get_max_week(self, db: Session):
+    def get_games_by_week(self, db: Session, week_num: int) -> list[Game]:
+        return crud.game.get_games_by_week(db, week_num)
+
+    def get_max_week(self, db: Session) -> int:
         return db.query(func.max(Game.week)).scalar()
+
+    def get_losers_for_week(self, db:Session, week_num: int) -> list[str]:
+        return crud.game.get_losers_for_week(db, week_num)
 
 
 

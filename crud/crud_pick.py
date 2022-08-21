@@ -14,5 +14,8 @@ class CRUDPick(CRUDBase[Pick, PickCreate, PickUpdate]):
         pick_models = db.query(Pick).filter_by(player_team_id=player_team_id).all()
         return pick_models
 
+    def get_player_team_pick_for_week(self, db: Session, player_team_id: UUID, week_num: int) -> Pick:
+        return db.query(Pick).filter_by(player_team_id=player_team_id, week_num=week_num).first()
+
 
 pick = CRUDPick(Pick)

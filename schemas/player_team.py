@@ -24,6 +24,10 @@ class AdminPlayerTeamUpdate(BaseModel):
     paid: bool
 
 
+class AdminPlayerTeamAdvanceWeek(AdminPlayerTeamUpdate):
+    streak: int
+
+
 class PlayerTeamUpdate(BaseModel):
     name: str
 
@@ -46,3 +50,8 @@ class PlayerTeamResponseFull(PlayerTeamResponse):
 
 class PlayerTeamList(BaseModel):
     teams: list[PlayerTeamResponse]
+
+
+class AdvanceWeekResponse(BaseModel):
+    deactivated_teams= list[PlayerTeamResponse]
+    advancing_teams=list[PlayerTeamResponse]

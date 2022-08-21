@@ -34,5 +34,8 @@ class PickService:
         pick_model = crud.pick.get_weekly_pick(db, player_team_id, week_num)
         return pick_model
 
+    def get_player_team_pick_for_week(self, db: Session, player_team_id: UUID, week_num: int) -> Pick:
+        return crud.pick.get_player_team_pick_for_week(db, player_team_id, week_num)
+
 
 pick_service = PickService()
