@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from strawberry.fastapi import GraphQLRouter
 from starlette.middleware.sessions import SessionMiddleware
 from core.config import settings
-from api.v1.endpoints import admin_message, advance_week, auth, game, league, league_type, message_type, nfl_team, pick, player_team, stadium, user
+from api.v1.endpoints import admin_message, advance_week, auth, game, \
+    league, league_type, message_type, nfl_team, pick, player_team, stadium, stats, user
 
 
 
@@ -37,6 +38,7 @@ app.include_router(pick.authorized_router)
 app.include_router(player_team.authorized_router)
 app.include_router(player_team.admin_router)
 app.include_router(stadium.authorized_router)
+app.include_router(stats.authorized_router)
 app.include_router(user.unauthorized_router)
 app.include_router(user.authorized_router)
 app.include_router(user.admin_router)
