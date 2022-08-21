@@ -53,5 +53,5 @@ class PlayerTeamList(BaseModel):
 
 
 class AdvanceWeekResponse(BaseModel):
-    deactivated_teams= list[PlayerTeamResponse]
-    advancing_teams=list[PlayerTeamResponse]
+    deactivated_teams: list[PlayerTeamResponse]
+    advancing_teams: list[PlayerTeamResponse]

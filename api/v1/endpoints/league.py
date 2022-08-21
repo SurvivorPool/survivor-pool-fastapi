@@ -39,6 +39,10 @@ def get_leagues(db: Session = Depends(dependencies.get_db)):
 @authenticated_router.get('/{league_id}')
 def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
     league_model = league_service.get_by_id(db, league_id)
+
+    if not league_model:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cannot find league with that id")
+
     league_response = LeagueResponseFull(
         id=league_model.id,
         name=league_model.name,
