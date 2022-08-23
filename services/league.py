@@ -12,6 +12,10 @@ class LeagueService:
         return crud.league.get(db, league_id)
 
     def create_league(self, db: Session, league_create_input: LeagueCreate):
+
+        if league_create_input.type_id is None:
+            standard_league_type = crud.league_type.get_by_name(db, "Standard")
+            league_create_input.type_id = standard_league_type.id
         league_type_model = crud.league_type.get(db, league_create_input.type_id)
         if not league_type_model:
             raise Exception("League Type not found")

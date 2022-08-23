@@ -10,7 +10,7 @@ class CRUDPlayerTeam(CRUDBase[PlayerTeam, PlayerTeamCreate, PlayerTeamUpdate]):
     def get_by_league_id(self, db: Session, league_id: UUID):
         return db.query(PlayerTeam).filter_by(league_id=league_id)
 
-    def get_by_user_id(self, db: Session, user_id: UUID):
+    def get_by_user_id(self, db: Session, user_id: str):
         return db.query(PlayerTeam).filter_by(user_id=user_id)
 
     def get_active_teams(self, db: Session):

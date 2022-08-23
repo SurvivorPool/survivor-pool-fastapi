@@ -13,7 +13,7 @@ class UserMessageService:
     def get_by_id(self, db: Session, message_id: UUID):
         return crud.user_message.get(db=db, id=message_id)
 
-    def get_unread_for_user_id(self, db: Session, user_id: UUID):
+    def get_unread_for_user_id(self, db: Session, user_id: str):
         unread_message_models = db.query(UserMessage).filter_by(read=False)
         return unread_message_models
 

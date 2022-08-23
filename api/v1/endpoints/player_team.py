@@ -39,7 +39,16 @@ def get_player_team(player_team_id: UUID,db: Session = Depends(dependencies.get_
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
-        league=LeagueResponse(**player_team_model.league.__dict__)
+        league=LeagueResponse(
+            id=player_team_model.league.id,
+            name=player_team_model.league.name,
+            description=player_team_model.league.description,
+            price=player_team_model.league.price,
+            start_week=player_team_model.league.start_week,
+            completed=player_team_model.league.completed,
+            type_id=player_team_model.league.type_id,
+            pot=len(player_team_model.league.teams) * player_team_model.league.price
+        )
     )
     return player_team_response
 
@@ -82,7 +91,16 @@ def update_player_team(
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
-        league=LeagueResponse(**player_team_model.league.__dict__)
+        league=LeagueResponse(
+            id=player_team_model.league.id,
+            name=player_team_model.league.name,
+            description=player_team_model.league.description,
+            price=player_team_model.league.price,
+            start_week=player_team_model.league.start_week,
+            completed=player_team_model.league.completed,
+            type_id=player_team_model.league.type_id,
+            pot=len(player_team_model.league.teams) * player_team_model.league.price
+        )
     )
     return player_team_response
 
@@ -121,7 +139,16 @@ def admin_update_player_team(
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
-        league=LeagueResponse(**player_team_model.league.__dict__)
+        league=LeagueResponse(
+            id=player_team_model.league.id,
+            name=player_team_model.league.name,
+            description=player_team_model.league.description,
+            price=player_team_model.league.price,
+            start_week=player_team_model.league.start_week,
+            completed=player_team_model.league.completed,
+            type_id=player_team_model.league.type_id,
+            pot=len(player_team_model.league.teams) * player_team_model.league.price
+        )
     )
     return player_team_response
 

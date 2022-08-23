@@ -28,13 +28,35 @@ def get_leagues(db: Session = Depends(dependencies.get_db)):
     league_models = league_service.get_all(db)
     league_responses = []
     for league_model in league_models:
-        league_response = LeagueResponse(**league_model.__dict__)
+        league_response = LeagueResponse(
+            id=league_model.id,
+            name=league_model.name,
+            description=league_model.description,
+            price=league_model.price,
+            start_week=league_model.start_week,
+            completed=league_model.completed,
+            type_id=league_model.type_id,
+            pot=len(league_model.teams) * league_model.price
+        )
         league_responses.append(league_response)
 
     leagues_response = LeagueList(leagues=league_responses)
 
     return leagues_response
 
+
+@authenticated_router.get('/user/{user_id}', response_model=LeagueList)
+def get_leagues_for_user(user_id: str, db: Session = Depends(dependencies.get_db)):
+    player_teams = player_team_service.get_by_user_id(db, user_id)
+
+    league_responses = []
+    for player_team in player_teams:
+        league_model = player_team.league
+        league_response = LeagueResponse(**league_model.__dict__)
+
+    leagues_response = LeagueList(leagues=league_responses)
+
+    return leagues_response
 
 @authenticated_router.get('/{league_id}')
 def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):

@@ -84,7 +84,7 @@ def create_message(message_create_input: UserMessageCreate, db: Session = Depend
 
 @authorized_router.get('/{user_id}/messages/unread', response_model=UserMessageList)
 def get_unread_messages(
-        user_id: UUID,
+        user_id: str,
         db: Session = Depends(dependencies.get_db),
         current_user = Depends(dependencies.get_current_user)
 ):
@@ -116,7 +116,7 @@ def get_unread_messages(
 
 @authorized_router.put('/{user_id}/messages/{message_id}', response_model=UserMessageResponseFull)
 def update_read(
-        user_id: UUID,
+        user_id: str,
         message_id: UUID,
         user_message_update_input: UserMessageUpdate,
         current_user: User = Depends(dependencies.get_current_user),

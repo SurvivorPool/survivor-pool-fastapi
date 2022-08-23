@@ -13,7 +13,7 @@ class UserMessage(Base):
     created_date = Column(DateTime(timezone=True), default=func.now())
     read = Column(Boolean, default=False, server_default="False", nullable=False)
     read_date = Column(DateTime(timezone=True))
-    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), default=uuid.uuid4, nullable=False)
+    user_id = Column(String, ForeignKey("user.id"), nullable=False)
 
     message_type = relationship("MessageType")
     user = relationship("User")

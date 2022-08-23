@@ -6,7 +6,7 @@ from schemas.league import LeagueResponse
 
 class PlayerTeamBase(BaseModel):
     league_id: UUID
-    user_id: UUID
+    user_id: str
     name: str
     active: bool
     paid: bool
@@ -15,7 +15,7 @@ class PlayerTeamBase(BaseModel):
 
 class PlayerTeamCreate(BaseModel):
     league_id: UUID
-    user_id: UUID
+    user_id: str
     name: str
 
 

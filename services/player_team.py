@@ -18,7 +18,7 @@ class PlayerTeamService:
     def get_by_id(self, db: Session, player_team_id: UUID) -> PlayerTeam:
         return crud.player_team.get(db, player_team_id)
 
-    def get_by_user_id(self, db: Session, user_id: UUID) -> list[PlayerTeam]:
+    def get_by_user_id(self, db: Session, user_id: str) -> list[PlayerTeam]:
         return crud.player_team.get_by_user_id(db, user_id)
 
     def get_active_teams(self, db: Session) -> list[PlayerTeam]:

@@ -6,20 +6,11 @@ from schemas.user import UserUpdate, UserCreate
 
 
 class UserService:
-    def get_by_id(self, db: Session, user_id: UUID):
+    def get_by_id(self, db: Session, user_id: str):
         return crud.user.get(db, user_id)
 
     def get_all(self, db: Session):
         return crud.user.get_multi(db=db)
-
-    def get_by_email_and_provider(
-            self,
-            db: Session,
-            email: str,
-            provider: str
-    ):
-        user_model = crud.user.get_by_email_and_provider(db=db, email=email, provider=provider)
-        return user_model
 
     def create(self, db: Session, user_create: UserCreate):
         return crud.user.create(db, obj_in=user_create)
