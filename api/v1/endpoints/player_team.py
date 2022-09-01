@@ -7,6 +7,7 @@ from models.user import User
 from schemas.common import DeleteModel
 from schemas.league import LeagueResponse
 from schemas.user import UserResponse
+from services.league import league_service
 from services.player_team import player_team_service
 from schemas.player_team import AdminPlayerTeamUpdate, PlayerTeamCreate, PlayerTeamUpdate, PlayerTeamResponse, PlayerTeamResponseFull, PlayerTeamList
 
@@ -39,6 +40,7 @@ def get_player_team(player_team_id: UUID,db: Session = Depends(dependencies.get_
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
+        current_pick=player_team_service.get_current_pick(db, player_team_model.id),
         league=LeagueResponse(
             id=player_team_model.league.id,
             name=player_team_model.league.name,
@@ -47,7 +49,8 @@ def get_player_team(player_team_id: UUID,db: Session = Depends(dependencies.get_
             start_week=player_team_model.league.start_week,
             completed=player_team_model.league.completed,
             type_id=player_team_model.league.type_id,
-            pot=len(player_team_model.league.teams) * player_team_model.league.price
+            pot=len(player_team_model.league.teams) * player_team_model.league.price,
+            signup_active=(not league_service.has_league_started(db, player_team_model.league_id))
         )
     )
     return player_team_response
@@ -69,7 +72,18 @@ def create_player_team(
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
-        league=LeagueResponse(**player_team_model.league.__dict__)
+        current_pick=player_team_service.get_current_pick(db, player_team_model.id),
+        league=LeagueResponse(
+            id=player_team_model.league.id,
+            name=player_team_model.league.name,
+            description=player_team_model.league.description,
+            price=player_team_model.league.price,
+            start_week=player_team_model.league.start_week,
+            completed=player_team_model.league.completed,
+            type_id=player_team_model.league.type_id,
+            pot=len(player_team_model.league.teams) * player_team_model.league.price,
+            signup_active=(not league_service.has_league_started(db, player_team_model.league_id))
+        )
     )
     return player_team_response
 
@@ -81,6 +95,10 @@ def update_player_team(
         db: Session = Depends(dependencies.get_db),
         current_user: User = Depends(dependencies.get_current_user)
 ):
+    player_team_check = player_team_service.get_by_id(db, player_team_id)
+    if player_team_check.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot update another user's team")
+
     player_team_model = player_team_service.update_player_team(db, player_team_id, player_team_input, current_user)
     player_team_response = PlayerTeamResponseFull(
         id=player_team_model.id,
@@ -91,6 +109,7 @@ def update_player_team(
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
+        current_pick=player_team_service.get_current_pick(db, player_team_model.id),
         league=LeagueResponse(
             id=player_team_model.league.id,
             name=player_team_model.league.name,
@@ -99,7 +118,8 @@ def update_player_team(
             start_week=player_team_model.league.start_week,
             completed=player_team_model.league.completed,
             type_id=player_team_model.league.type_id,
-            pot=len(player_team_model.league.teams) * player_team_model.league.price
+            pot=len(player_team_model.league.teams) * player_team_model.league.price,
+            signup_active=(not league_service.has_league_started(db, player_team_model.league_id))
         )
     )
     return player_team_response
@@ -110,7 +130,16 @@ def admin_get_all_player_teams(db: Session = Depends(dependencies.get_db)):
     player_team_models = player_team_service.get_all(db)
     player_team_responses = []
     for player_team_model in player_team_models:
-        player_team_response = PlayerTeamResponse(**player_team_model.__dict__)
+        player_team_response = PlayerTeamResponse(
+                id=player_team_model.id,
+                league_id=player_team_model.league_id,
+                user_id=player_team_model.user_id,
+                name=player_team_model.name,
+                active=player_team_model.active,
+                paid=player_team_model.paid,
+                streak=player_team_model.streak,
+                current_pick=player_team_service.get_current_pick(db, player_team_model.id)
+            )
         player_team_responses.append(player_team_response)
 
     player_teams_response = PlayerTeamList(teams=player_team_responses)
@@ -138,6 +167,7 @@ def admin_update_player_team(
         active=player_team_model.active,
         paid=player_team_model.paid,
         streak=player_team_model.streak,
+        current_pick=player_team_service.get_current_pick(db, player_team_model.id),
         user=UserResponse(**player_team_model.user.__dict__),
         league=LeagueResponse(
             id=player_team_model.league.id,
@@ -147,7 +177,8 @@ def admin_update_player_team(
             start_week=player_team_model.league.start_week,
             completed=player_team_model.league.completed,
             type_id=player_team_model.league.type_id,
-            pot=len(player_team_model.league.teams) * player_team_model.league.price
+            pot=len(player_team_model.league.teams) * player_team_model.league.price,
+            signup_active=(not league_service.has_league_started(db, player_team_model.league_id))
         )
     )
     return player_team_response

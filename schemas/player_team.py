@@ -40,7 +40,7 @@ class PlayerTeamInDBBase(PlayerTeamBase):
 
 
 class PlayerTeamResponse(PlayerTeamInDBBase):
-    ...
+    current_pick: str
 
 
 class PlayerTeamResponseFull(PlayerTeamResponse):

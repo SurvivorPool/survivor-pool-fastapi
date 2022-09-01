@@ -3,10 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api import dependencies
 from models import PlayerTeam, League
-from schemas.league import LeagueCreate, LeagueUpdate, LeagueResponse, LeagueList
-from schemas.league_full import LeagueResponseFull
+from schemas.league import LeagueCreate, LeagueUpdate, LeagueResponse
+from schemas.league_full import LeagueResponseFull, LeagueListFull
 from schemas.league_type import LeagueTypeResponse
-from schemas.player_team import PlayerTeamResponse
+from schemas.player_team import PlayerTeamResponse, PlayerTeamResponseFull
+from schemas.user import UserResponse
 from services.league import league_service
 from services.player_team import player_team_service
 
@@ -23,12 +24,62 @@ admin_router = APIRouter(
 )
 
 
-@authenticated_router.get('/', response_model=LeagueList)
+@authenticated_router.get('/', response_model=LeagueListFull)
 def get_leagues(db: Session = Depends(dependencies.get_db)):
     league_models = league_service.get_all(db)
     league_responses = []
     for league_model in league_models:
-        league_response = LeagueResponse(
+        league_response = LeagueResponseFull(
+            id=league_model.id,
+            name=league_model.name,
+            description=league_model.description,
+            price="{:,.2f}".format(league_model.price),
+            start_week=league_model.start_week,
+            completed=league_model.completed,
+            type_id=league_model.type_id,
+            pot=len(league_model.teams) * league_model.price,
+            signup_active=(not league_service.has_league_started(db, league_model.id)),
+            league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
+            teams=[
+                PlayerTeamResponseFull(
+                    id=player_team.id,
+                    league_id=player_team.league_id,
+                    user_id=player_team.user_id,
+                    name=player_team.name,
+                    active=player_team.active,
+                    paid=player_team.paid,
+                    streak=player_team.streak,
+                    current_pick=player_team_service.get_current_pick(db, player_team.id),
+                    user=UserResponse(**player_team.user.__dict__),
+                    league=LeagueResponse(
+                        id=player_team.league.id,
+                        name=player_team.league.name,
+                        description=player_team.league.description,
+                        price=player_team.league.price,
+                        start_week=player_team.league.start_week,
+                        completed=player_team.league.completed,
+                        type_id=player_team.league.type_id,
+                        pot=len(player_team.league.teams) * player_team.league.price,
+                        signup_active=(not league_service.has_league_started(db, player_team.league_id))
+                    )
+            )
+                for player_team in league_model.teams]
+        )
+        league_responses.append(league_response)
+
+    leagues_response = LeagueListFull(leagues=league_responses)
+
+    return leagues_response
+
+
+@authenticated_router.get('/user/{user_id}', response_model=LeagueListFull)
+def get_leagues_for_user(user_id: str, db: Session = Depends(dependencies.get_db)):
+    player_teams = player_team_service.get_by_user_id(db, user_id)
+
+    league_responses = []
+    for player_team in player_teams:
+        league_model = player_team.league
+        league_response = LeagueResponseFull(
             id=league_model.id,
             name=league_model.name,
             description=league_model.description,
@@ -36,27 +87,37 @@ def get_leagues(db: Session = Depends(dependencies.get_db)):
             start_week=league_model.start_week,
             completed=league_model.completed,
             type_id=league_model.type_id,
-            pot=len(league_model.teams) * league_model.price
+            pot=len(league_model.teams) * league_model.price,
+            signup_active=(not league_service.has_league_started(db, league_model.id)),
+            league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
+            teams=[PlayerTeamResponseFull(
+            id=player_team.id,
+            league_id=player_team.league_id,
+            user_id=player_team.user_id,
+            name=player_team.name,
+            active=player_team.active,
+            paid=player_team.paid,
+            streak=player_team.streak,
+            current_pick=player_team_service.get_current_pick(db, player_team.id),
+            user=UserResponse(**player_team.user.__dict__),
+            league=LeagueResponse(
+                id=player_team.league.id,
+                name=player_team.league.name,
+                description=player_team.league.description,
+                price=player_team.league.price,
+                start_week=player_team.league.start_week,
+                completed=player_team.league.completed,
+                type_id=player_team.league.type_id,
+                pot=len(player_team.league.teams) * player_team.league.price,
+                signup_active=(not league_service.has_league_started(db, player_team.league_id)))
+            ) for player_team in league_model.teams]
         )
         league_responses.append(league_response)
 
-    leagues_response = LeagueList(leagues=league_responses)
+    leagues_response = LeagueListFull(leagues=league_responses)
 
     return leagues_response
 
-
-@authenticated_router.get('/user/{user_id}', response_model=LeagueList)
-def get_leagues_for_user(user_id: str, db: Session = Depends(dependencies.get_db)):
-    player_teams = player_team_service.get_by_user_id(db, user_id)
-
-    league_responses = []
-    for player_team in player_teams:
-        league_model = player_team.league
-        league_response = LeagueResponse(**league_model.__dict__)
-
-    leagues_response = LeagueList(leagues=league_responses)
-
-    return leagues_response
 
 @authenticated_router.get('/{league_id}')
 def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
@@ -73,8 +134,30 @@ def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
         start_week=league_model.start_week,
         completed=league_model.completed,
         type_id=league_model.type_id,
+        pot=len(league_model.teams) * league_model.price,
+        signup_active=(not league_service.has_league_started(db, league_model.id)),
         league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
-        teams=[PlayerTeamResponse(**player_team.__dict__) for player_team in league_model.teams]
+        teams=[PlayerTeamResponseFull(
+            id=player_team.id,
+            league_id=player_team.league_id,
+            user_id=player_team.user_id,
+            name=player_team.name,
+            active=player_team.active,
+            paid=player_team.paid,
+            streak=player_team.streak,
+            user=UserResponse(**player_team.user.__dict__),
+            current_pick=player_team_service.get_current_pick(db, player_team.id),
+            league=LeagueResponse(
+                id=player_team.league.id,
+                name=player_team.league.name,
+                description=player_team.league.description,
+                price=player_team.league.price,
+                start_week=player_team.league.start_week,
+                completed=player_team.league.completed,
+                type_id=player_team.league.type_id,
+                pot=len(player_team.league.teams) * player_team.league.price,
+                signup_active=(not league_service.has_league_started(db, player_team.league_id)))
+            ) for player_team in league_model.teams]
     )
 
     return league_response
@@ -98,8 +181,31 @@ def create_league(league_create_input: LeagueCreate, db: Session = Depends(depen
         start_week=league_model.start_week,
         completed=league_model.completed,
         type_id=league_model.type_id,
+        pot=len(league_model.teams) * league_model.price,
+        signup_active=(not league_service.has_league_started(db, league_model.id)),
         league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
-        teams=[]
+        teams=[PlayerTeamResponseFull(
+            id=player_team.id,
+            league_id=player_team.league_id,
+            user_id=player_team.user_id,
+            name=player_team.name,
+            active=player_team.active,
+            paid=player_team.paid,
+            streak=player_team.streak,
+            user=UserResponse(**player_team.user.__dict__),
+            current_pick=player_team_service.get_current_pick(db, player_team.id),
+            league=LeagueResponse(
+                id=player_team.league.id,
+                name=player_team.league.name,
+                description=player_team.league.description,
+                price=player_team.league.price,
+                start_week=player_team.league.start_week,
+                completed=player_team.league.completed,
+                type_id=player_team.league.type_id,
+                pot=len(player_team.league.teams) * player_team.league.price,
+                signup_active=(not league_service.has_league_started(db, player_team.league_id))
+            )
+        ) for player_team in league_model.teams]
     )
 
     return league_response
@@ -122,7 +228,29 @@ def update_league(league_update_input: LeagueUpdate, db: Session = Depends(depen
             start_week=league_model.start_week,
             completed=league_model.completed,
             type_id=league_model.type_id,
+            pot=len(league_model.teams) * league_model.price,
+            signup_active=(not league_service.has_league_started(db, league_model.id)),
             league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
-            teams=[PlayerTeamResponse(**player_team.__dict__) for player_team in league_model.teams]
+            teams=[PlayerTeamResponseFull(
+            id=player_team.id,
+            league_id=player_team.league_id,
+            user_id=player_team.user_id,
+            name=player_team.name,
+            active=player_team.active,
+            paid=player_team.paid,
+            streak=player_team.streak,
+            current_pick=player_team_service.get_current_pick(db, player_team.id),
+            user=UserResponse(**player_team.user.__dict__),
+            league=LeagueResponse(
+                id=player_team.league.id,
+                name=player_team.league.name,
+                description=player_team.league.description,
+                price=player_team.league.price,
+                start_week=player_team.league.start_week,
+                completed=player_team.league.completed,
+                type_id=player_team.league.type_id,
+                pot=len(player_team.league.teams) * player_team.league.price,
+                signup_active=(not league_service.has_league_started(db, player_team.league_id)))
+            ) for player_team in league_model.teams]
         )
     return league_response

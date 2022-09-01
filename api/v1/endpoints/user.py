@@ -6,6 +6,7 @@ from models import User
 from schemas.player_team import PlayerTeamResponse
 from schemas.user import UserUpdate, UserExistsCheckResponse, UserCreate
 from schemas.user_full import UserResponseFull, UsersListFull
+from services.player_team import player_team_service
 from services.user import user_service
 
 authorized_router = APIRouter(
@@ -45,7 +46,16 @@ def create_user(user_create_input: UserCreate, db: Session = Depends(dependencie
         picture_url=user_model.picture_url,
         receive_notifications=user_model.receive_notifications,
         wins=user_model.wins,
-        teams=[PlayerTeamResponse(team) for team in user_model.teams]
+        teams=[PlayerTeamResponse(
+                id=team.id,
+                league_id=team.league_id,
+                user_id=team.user_id,
+                name=team.name,
+                active=team.active,
+                paid=team.paid,
+                streak=team.streak,
+                current_pick=player_team_service.get_current_pick(db, team.id)
+            ) for team in user_model.teams]
     )
 
 
@@ -70,7 +80,16 @@ def get_user(user_id: str,
         picture_url=user_model.picture_url,
         receive_notifications=user_model.receive_notifications,
         wins=user_model.wins,
-        teams=[PlayerTeamResponse(**team.__dict__) for team in user_model.teams]
+        teams=[PlayerTeamResponse(
+                id=team.id,
+                league_id=team.league_id,
+                user_id=team.user_id,
+                name=team.name,
+                active=team.active,
+                paid=team.paid,
+                streak=team.streak,
+                current_pick=player_team_service.get_current_pick(db, team.id)
+            ) for team in user_model.teams]
     )
     return user_response
 
@@ -99,7 +118,16 @@ def update_user(
         receive_notifications=user_model.receive_notifications,
         provider=user_model.provider,
         wins=user_model.wins,
-        teams=[PlayerTeamResponse(**team.__dict__) for team in user_model.teams]
+        teams=[PlayerTeamResponse(
+                id=team.id,
+                league_id=team.league_id,
+                user_id=team.user_id,
+                name=team.name,
+                active=team.active,
+                paid=team.paid,
+                streak=team.streak,
+                current_pick=player_team_service.get_current_pick(db, team.id)
+            ) for team in user_model.teams]
     )
     return user_response
 
@@ -117,7 +145,16 @@ def get_all_users(db: Session = Depends(dependencies.get_db)):
             picture_url=user_model.picture_url,
             receive_notifications=user_model.receive_notifications,
             wins=user_model.wins,
-            teams=[PlayerTeamResponse(**team.__dict__) for team in user_model.teams]
+            teams=[PlayerTeamResponse(
+                id=team.id,
+                league_id=team.league_id,
+                user_id=team.user_id,
+                name=team.name,
+                active=team.active,
+                paid=team.paid,
+                streak=team.streak,
+                current_pick=player_team_service.get_current_pick(db, team.id)
+            ) for team in user_model.teams]
         )
         user_responses.append(user_response)
 

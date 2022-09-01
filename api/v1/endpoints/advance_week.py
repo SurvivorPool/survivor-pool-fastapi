@@ -54,7 +54,8 @@ def advance_week(db: Session = Depends(dependencies.get_db)):
             name=deactivated_team.name,
             active=deactivated_team.active,
             paid=deactivated_team.paid,
-            streak=deactivated_team.streak
+            streak=deactivated_team.streak,
+            current_pick=player_team_service.get_current_pick(db, deactivated_team.id),
         ) for deactivated_team in deactivated_teams],
         advancing_teams=[PlayerTeamResponse(
             id=advancing_team.id,
@@ -63,7 +64,8 @@ def advance_week(db: Session = Depends(dependencies.get_db)):
             name=advancing_team.name,
             active=advancing_team.active,
             paid=advancing_team.paid,
-            streak=advancing_team.streak
+            streak=advancing_team.streak,
+            current_pick=player_team_service.get_current_pick(db, advancing_team.id),
         ) for advancing_team in advancing_teams]
     )
     return advance_week_response

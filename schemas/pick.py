@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from uuid import UUID
 from typing import Optional
 
+from schemas.game import GameResponse
+from schemas.nfl_team import NFLTeamResponse
+from schemas.player_team import PlayerTeamResponse
+
 
 class PickBase(BaseModel):
     player_team_id: UUID
@@ -23,7 +27,3 @@ class PickInDBBase(PickBase):
 
 class PickResponse(PickInDBBase):
     ...
-
-
-
-

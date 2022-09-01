@@ -2,12 +2,11 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from api import dependencies
+from schemas.nfl_team import NFLTeamResponse
 from services.game import game_service
 from services.odds import odds_service
 from services.stadium import stadium_service
 from schemas.game import GameResponseFull, GameList
-from schemas.odds import OddsResponse
-from schemas.stadium import StadiumResponse
 
 authorized_router = APIRouter(
     prefix='/games',
@@ -40,7 +39,9 @@ async def games(db: Session = Depends(dependencies.get_db)):
             week=game_model.week,
             stadium_id=game_model.stadium_id,
             odds=odds_model,
-            stadium=stadium_model
+            stadium=stadium_model,
+            home_team_info=NFLTeamResponse(**game_model.home_team_info.__dict__),
+            away_team_info=NFLTeamResponse(**game_model.away_team_info.__dict__),
         )
 
         game_responses.append(game_response)

@@ -2,9 +2,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from models import PlayerTeam
+from models import PlayerTeam, Pick
 from models.user import User
 from schemas.player_team import AdminPlayerTeamAdvanceWeek, PlayerTeamCreate, PlayerTeamUpdate
+from services.game import game_service
 import crud
 
 
@@ -70,6 +71,11 @@ class PlayerTeamService:
             streak=player_team.streak + 1
         )
         return crud.player_team.update(db=db, db_obj=player_team, obj_in=player_team_update_input)
+
+    def get_current_pick(self, db, player_team_id: UUID):
+        max_week = game_service.get_max_week(db)
+        current_pick = db.query(Pick).filter_by(player_team_id=player_team_id, week_num=max_week).first()
+        return current_pick.nfl_team_name if current_pick else ""
 
 
 

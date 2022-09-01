@@ -1,5 +1,4 @@
 from typing import Optional
-
 from pydantic import BaseModel
 from uuid import UUID
 
@@ -36,6 +35,7 @@ class LeagueInDBBase(LeagueBase):
 
 class LeagueResponse(LeagueInDBBase):
     pot: float
+    signup_active: bool
 
 
 class LeagueList(BaseModel):
