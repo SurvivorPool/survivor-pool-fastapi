@@ -9,7 +9,7 @@ from schemas.league import LeagueResponse
 from schemas.user import UserResponse
 from services.league import league_service
 from services.player_team import player_team_service
-from schemas.player_team import AdminPlayerTeamUpdate, PlayerTeamCreate, PlayerTeamUpdate, PlayerTeamResponse, PlayerTeamResponseFull, PlayerTeamList
+from schemas.player_team import AdminPlayerTeamUpdate, PlayerTeamCreate, PlayerTeamUpdate,PlayerTeamResponseFull, PlayerTeamList
 
 authorized_router = APIRouter(
     prefix='/player_teams',
@@ -130,7 +130,7 @@ def admin_get_all_player_teams(db: Session = Depends(dependencies.get_db)):
     player_team_models = player_team_service.get_all(db)
     player_team_responses = []
     for player_team_model in player_team_models:
-        player_team_response = PlayerTeamResponse(
+        player_team_response = PlayerTeamResponseFull(
                 id=player_team_model.id,
                 league_id=player_team_model.league_id,
                 user_id=player_team_model.user_id,
@@ -138,7 +138,17 @@ def admin_get_all_player_teams(db: Session = Depends(dependencies.get_db)):
                 active=player_team_model.active,
                 paid=player_team_model.paid,
                 streak=player_team_model.streak,
-                current_pick=player_team_service.get_current_pick(db, player_team_model.id)
+                current_pick=player_team_service.get_current_pick(db, player_team_model.id),
+                user=UserResponse(**player_team_model.user.__dict__),
+                league=LeagueResponse(id=player_team_model.league.id,
+                        name=player_team_model.league.name,
+                        description=player_team_model.league.description,
+                        price=player_team_model.league.price,
+                        start_week=player_team_model.league.start_week,
+                        completed=player_team_model.league.completed,
+                        type_id=player_team_model.league.type_id,
+                        pot=len(player_team_model.league.teams) * player_team_model.league.price,
+                        signup_active=(not league_service.has_league_started(db, player_team_model.league_id)))
             )
         player_team_responses.append(player_team_response)
 

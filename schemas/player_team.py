@@ -49,7 +49,7 @@ class PlayerTeamResponseFull(PlayerTeamResponse):
 
 
 class PlayerTeamList(BaseModel):
-    teams: list[PlayerTeamResponse]
+    teams: list[PlayerTeamResponseFull]
 
 
 class AdvanceWeekResponse(BaseModel):
