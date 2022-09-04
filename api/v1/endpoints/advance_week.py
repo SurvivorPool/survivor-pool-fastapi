@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from api import dependencies
 from schemas.player_team import AdvanceWeekResponse, PlayerTeamResponse
 from services.game import game_service
-from services.league import league_service
 from services.pick import pick_service
 from services.player_team import player_team_service
 
