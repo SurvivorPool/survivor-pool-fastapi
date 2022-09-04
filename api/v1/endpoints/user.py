@@ -35,7 +35,7 @@ def check_user_existence(user_id: str, db: Session = Depends(dependencies.get_db
     return existence_model
 
 
-@unauthorized_router.post('/', response_model=UserResponseFull)
+@unauthorized_router.post('', response_model=UserResponseFull)
 def create_user(user_create_input: UserCreate, db: Session = Depends(dependencies.get_db)):
     user_model = user_service.create(db, user_create_input)
     return UserResponseFull(
