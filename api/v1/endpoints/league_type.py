@@ -11,7 +11,7 @@ admin_router = APIRouter(
 )
 
 
-@admin_router.get('/', response_model=LeagueTypeList)
+@admin_router.get('', response_model=LeagueTypeList)
 def league_types(db: Session = Depends(dependencies.get_db)):
     league_type_models = league_type_service.get_all(db)
     league_types_responses = []
@@ -22,7 +22,7 @@ def league_types(db: Session = Depends(dependencies.get_db)):
     return league_types_response
 
 
-@admin_router.post('/', response_model=LeagueTypeResponse)
+@admin_router.post('', response_model=LeagueTypeResponse)
 def create_league_type(league_type_create: LeagueTypeCreate, db: Session = Depends(dependencies.get_db)):
     league_type_model = league_type_service.get_by_name(db, league_type_create.name)
 

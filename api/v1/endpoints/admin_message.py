@@ -24,7 +24,7 @@ authorized_router = APIRouter(
 )
 
 
-@admin_router.get('/', response_model=UserMessageList)
+@admin_router.get('', response_model=UserMessageList)
 def get_all_messages(db: Session = Depends(dependencies.get_db)):
     message_models = user_message_service.get_all(db)
     message_responses = []
@@ -47,7 +47,7 @@ def get_all_messages(db: Session = Depends(dependencies.get_db)):
     return messages_response
 
 
-@admin_router.post('/', response_model=UserMessageList)
+@admin_router.post('', response_model=UserMessageList)
 def create_message(message_create_input: UserMessageCreate, db: Session = Depends(dependencies.get_db)):
     if message_create_input.all_users:
         user_models = user_service.get_all(db)

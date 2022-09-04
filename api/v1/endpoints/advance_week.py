@@ -17,7 +17,7 @@ admin_router = APIRouter(
 )
 
 
-@admin_router.put('/', response_model=AdvanceWeekResponse)
+@admin_router.put('', response_model=AdvanceWeekResponse)
 def advance_week(db: Session = Depends(dependencies.get_db)):
     # await game_service.update_games(db)
 

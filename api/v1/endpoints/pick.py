@@ -19,7 +19,7 @@ authorized_router = APIRouter(
 )
 
 
-@authorized_router.put('/', response_model=PickResponseFull)
+@authorized_router.put('', response_model=PickResponseFull)
 async def make_pick(
         pick_upsert_input: PickUpdate,
         db: Session = Depends(dependencies.get_db),

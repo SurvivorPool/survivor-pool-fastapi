@@ -132,7 +132,7 @@ def update_user(
     return user_response
 
 
-@admin_router.get('/', response_model=UsersListFull)
+@admin_router.get('', response_model=UsersListFull)
 def get_all_users(db: Session = Depends(dependencies.get_db)):
     user_models = user_service.get_all(db)
     user_responses = []

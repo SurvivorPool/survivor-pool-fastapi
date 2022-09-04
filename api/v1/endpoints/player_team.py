@@ -125,7 +125,7 @@ def update_player_team(
     return player_team_response
 
 
-@admin_router.get('/', response_model=PlayerTeamList)
+@admin_router.get('', response_model=PlayerTeamList)
 def admin_get_all_player_teams(db: Session = Depends(dependencies.get_db)):
     player_team_models = player_team_service.get_all(db)
     player_team_responses = []

@@ -11,7 +11,7 @@ authorized_router = APIRouter(
 )
 
 
-@authorized_router.get('/', response_model=NFLTeamList)
+@authorized_router.get('', response_model=NFLTeamList)
 async def nfl_teams(db: Session = Depends(dependencies.get_db)):
     await nfl_team_service.update_nfl_teams(db)
     nfl_team_models = nfl_team_service.get_teams(db)

@@ -162,7 +162,7 @@ def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
     return league_response
 
 
-@admin_router.post('/', response_model=LeagueResponseFull)
+@admin_router.post('', response_model=LeagueResponseFull)
 def create_league(league_create_input: LeagueCreate, db: Session = Depends(dependencies.get_db)):
     try:
         league_model = league_service.create_league(db, league_create_input)
@@ -210,7 +210,7 @@ def create_league(league_create_input: LeagueCreate, db: Session = Depends(depen
     return league_response
 
 
-@admin_router.put('/', response_model=LeagueResponseFull)
+@admin_router.put('', response_model=LeagueResponseFull)
 def update_league(league_update_input: LeagueUpdate, db: Session = Depends(dependencies.get_db)):
     try:
         league_model = league_service.update_league(db, league_update_input)

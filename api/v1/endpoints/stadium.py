@@ -11,7 +11,7 @@ authorized_router = APIRouter(
 )
 
 
-@authorized_router.get('/', response_model=StadiumList)
+@authorized_router.get('', response_model=StadiumList)
 async def stadiums(db: Session = Depends(dependencies.get_db)):
     await stadium_service.update_stadiums(db)
     stadium_models = stadium_service.get_stadiums(db)
