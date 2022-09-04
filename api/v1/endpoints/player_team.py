@@ -169,6 +169,7 @@ def admin_update_player_team(
         admin_player_team_update,
         current_user
     )
+    
     player_team_response = PlayerTeamResponseFull(
         id=player_team_model.id,
         league_id=player_team_model.league_id,
