@@ -47,20 +47,15 @@ def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
 
     auth_header = request.headers['auth']
     try:
-        print("Verifying auth header: " + auth_header)
         payload = auth.verify_id_token(auth_header)
-        print("Done verifying auth header")
         user_id = payload.get('sub')
 
         if user_id is None:
-            print("raising exception because user id is null")
             raise credentials_exception
     except JWTError:
-        print("raising exception because header could not be verified")
         raise credentials_exception
     user = user_service.get_by_id(db, user_id)
     if user is None:
-        print("raising exception because user does not exist")
         raise credentials_exception
     return user
 
