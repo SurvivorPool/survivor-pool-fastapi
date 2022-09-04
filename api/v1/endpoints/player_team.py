@@ -56,7 +56,7 @@ def get_player_team(player_team_id: UUID,db: Session = Depends(dependencies.get_
     return player_team_response
 
 
-@authorized_router.post("/", response_model=PlayerTeamResponseFull)
+@authorized_router.post('', response_model=PlayerTeamResponseFull)
 def create_player_team(
         player_team_input: PlayerTeamCreate,
         db: Session = Depends(dependencies.get_db),
