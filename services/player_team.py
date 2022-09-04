@@ -75,6 +75,10 @@ class PlayerTeamService:
     def get_current_pick(self, db, player_team_id: UUID):
         max_week = game_service.get_max_week(db)
         current_pick = db.query(Pick).filter_by(player_team_id=player_team_id, week_num=max_week).first()
+        if current_pick:
+            game = game_service.get_by_id(db, current_pick.game_id)
+            if game.quarter == 'P':
+                current_pick = ''
         return current_pick.nfl_team_name if current_pick else ""
 
 
