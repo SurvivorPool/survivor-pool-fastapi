@@ -2,11 +2,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api import dependencies
-from models import PlayerTeam, League
 from schemas.league import LeagueCreate, LeagueUpdate, LeagueResponse
 from schemas.league_full import LeagueResponseFull, LeagueListFull
 from schemas.league_type import LeagueTypeResponse
-from schemas.player_team import PlayerTeamResponse, PlayerTeamResponseFull
+from schemas.player_team import PlayerTeamResponseFull
 from schemas.user import UserResponse
 from services.league import league_service
 from services.player_team import player_team_service
@@ -24,7 +23,7 @@ admin_router = APIRouter(
 )
 
 
-@authenticated_router.get('/', response_model=LeagueListFull)
+@authenticated_router.get('', response_model=LeagueListFull)
 def get_leagues(db: Session = Depends(dependencies.get_db)):
     league_models = league_service.get_all(db)
     league_responses = []
