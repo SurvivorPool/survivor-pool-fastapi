@@ -163,6 +163,12 @@ def admin_update_player_team(
         db: Session = Depends(dependencies.get_db),
         current_user = Depends(dependencies.get_admin_user)
 ):
+    player_team_model = player_team_service.get_by_id(db, player_team_id)
+
+    if not player_team_model:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player team not found")
+
+
     player_team_model = player_team_service.update_player_team(
         db,
         player_team_id,

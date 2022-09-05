@@ -42,11 +42,6 @@ class PlayerTeamService:
 
     def update_player_team(self, db: Session, player_team_id: UUID, player_team_input: PlayerTeamUpdate, current_user: User):
         player_team_model = crud.player_team.get(db, player_team_id)
-        if not player_team_model:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player team not found")
-
-        if player_team_model.user_id != current_user.id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot update team for another user")
 
         player_team_update_model = crud.player_team.update(db, db_obj=player_team_model, obj_in=player_team_input)
         return player_team_update_model
