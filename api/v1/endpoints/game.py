@@ -11,7 +11,7 @@ from schemas.game import GameResponseFull, GameList
 authorized_router = APIRouter(
     prefix='/games',
     tags=['games'],
-    # dependencies=[Depends(dependencies.get_current_user)]
+    dependencies=[Depends(dependencies.get_current_user)]
 )
 
 
