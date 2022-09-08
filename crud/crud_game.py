@@ -6,7 +6,7 @@ from schemas.game import GameCreate, GameUpdate
 
 class CRUDGame(CRUDBase[Game, GameCreate, GameUpdate]):
     def get_games_by_week(self, db: Session, week_num: int) -> list[Game]:
-        return db.query(Game).filter_by(week=week_num).all()
+        return db.query(Game).filter_by(week=week_num).order_by(Game.game_date).all()
 
     def get_losers_for_week(self, db: Session, week_num: int) -> list[str]:
         game_models = self.get_games_by_week(db, week_num)
