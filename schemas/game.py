@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
+
+from schemas.nfl_team import NFLTeamResponse
 from schemas.odds import OddsResponse
 from schemas.stadium import StadiumResponse
 
@@ -46,6 +48,9 @@ class GameResponse(GameInDBBase):
 class GameResponseFull(GameInDBBase):
     odds: Optional[OddsResponse]
     stadium: StadiumResponse
+    home_team_info: NFLTeamResponse
+    away_team_info: NFLTeamResponse
+
 
 
 class GameList(BaseModel):

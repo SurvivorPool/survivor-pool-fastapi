@@ -1,12 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from uuid import UUID
 
 from sqlalchemy.orm import Session
 
 from api import dependencies
 from schemas.player_team import AdvanceWeekResponse, PlayerTeamResponse
 from services.game import game_service
-from services.league import league_service
 from services.pick import pick_service
 from services.player_team import player_team_service
 
@@ -17,7 +15,7 @@ admin_router = APIRouter(
 )
 
 
-@admin_router.put('/', response_model=AdvanceWeekResponse)
+@admin_router.put('', response_model=AdvanceWeekResponse)
 def advance_week(db: Session = Depends(dependencies.get_db)):
     # await game_service.update_games(db)
 
@@ -54,7 +52,8 @@ def advance_week(db: Session = Depends(dependencies.get_db)):
             name=deactivated_team.name,
             active=deactivated_team.active,
             paid=deactivated_team.paid,
-            streak=deactivated_team.streak
+            streak=deactivated_team.streak,
+            current_pick=player_team_service.get_current_pick(db, deactivated_team.id),
         ) for deactivated_team in deactivated_teams],
         advancing_teams=[PlayerTeamResponse(
             id=advancing_team.id,
@@ -63,7 +62,8 @@ def advance_week(db: Session = Depends(dependencies.get_db)):
             name=advancing_team.name,
             active=advancing_team.active,
             paid=advancing_team.paid,
-            streak=advancing_team.streak
+            streak=advancing_team.streak,
+            current_pick=player_team_service.get_current_pick(db, advancing_team.id),
         ) for advancing_team in advancing_teams]
     )
     return advance_week_response

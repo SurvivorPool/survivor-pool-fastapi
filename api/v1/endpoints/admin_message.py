@@ -24,7 +24,7 @@ authorized_router = APIRouter(
 )
 
 
-@admin_router.get('/', response_model=UserMessageList)
+@admin_router.get('', response_model=UserMessageList)
 def get_all_messages(db: Session = Depends(dependencies.get_db)):
     message_models = user_message_service.get_all(db)
     message_responses = []
@@ -47,7 +47,7 @@ def get_all_messages(db: Session = Depends(dependencies.get_db)):
     return messages_response
 
 
-@admin_router.post('/', response_model=UserMessageList)
+@admin_router.post('', response_model=UserMessageList)
 def create_message(message_create_input: UserMessageCreate, db: Session = Depends(dependencies.get_db)):
     if message_create_input.all_users:
         user_models = user_service.get_all(db)
@@ -84,7 +84,7 @@ def create_message(message_create_input: UserMessageCreate, db: Session = Depend
 
 @authorized_router.get('/{user_id}/messages/unread', response_model=UserMessageList)
 def get_unread_messages(
-        user_id: UUID,
+        user_id: str,
         db: Session = Depends(dependencies.get_db),
         current_user = Depends(dependencies.get_current_user)
 ):
@@ -116,7 +116,7 @@ def get_unread_messages(
 
 @authorized_router.put('/{user_id}/messages/{message_id}', response_model=UserMessageResponseFull)
 def update_read(
-        user_id: UUID,
+        user_id: str,
         message_id: UUID,
         user_message_update_input: UserMessageUpdate,
         current_user: User = Depends(dependencies.get_current_user),

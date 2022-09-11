@@ -8,7 +8,6 @@ class UserBase(BaseModel):
     is_admin: bool
     picture_url: HttpUrl
     receive_notifications: bool
-    provider: str
     wins: int
 
 
@@ -16,8 +15,13 @@ class UserExistsCheckResponse(BaseModel):
     exists: bool
 
 
-class UserCreate(UserBase):
-    ...
+class UserCreate(BaseModel):
+    id: str
+    email: str
+    full_name: str
+    picture_url: str
+    receive_notifications: bool
+
 
 
 class UserUpdate(BaseModel):
@@ -26,7 +30,7 @@ class UserUpdate(BaseModel):
 
 # Properties shared by models stored in DB
 class UserInDBBase(UserBase):
-    id: UUID
+    id: str
 
     class Config:
         orm_mode = True

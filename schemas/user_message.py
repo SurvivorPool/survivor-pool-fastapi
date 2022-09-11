@@ -10,7 +10,7 @@ from schemas.user import UserResponse
 class UserMessageBase(BaseModel):
     text: str
     type_id: UUID
-    user_id: UUID
+    user_id: str
 
 
 class UserMessageCreate(BaseModel):

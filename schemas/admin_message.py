@@ -3,7 +3,7 @@ from uuid import UUID
 
 
 class AdminMessageBase(BaseModel):
-    user_id: UUID
+    user_id: str
     message: str
     show: bool
     type: str

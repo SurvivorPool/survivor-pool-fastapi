@@ -126,7 +126,11 @@ class GameService:
         return crud.game.get_games_by_week(db, week_num)
 
     def get_max_week(self, db: Session) -> int:
-        return db.query(func.max(Game.week)).scalar()
+        max_week = db.query(func.max(Game.week)).scalar()
+        if not max_week:
+            max_week = 1
+
+        return max_week
 
     def get_losers_for_week(self, db:Session, week_num: int) -> list[str]:
         return crud.game.get_losers_for_week(db, week_num)

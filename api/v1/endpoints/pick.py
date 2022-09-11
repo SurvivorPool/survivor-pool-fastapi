@@ -19,7 +19,7 @@ authorized_router = APIRouter(
 )
 
 
-@authorized_router.put('/', response_model=PickResponseFull)
+@authorized_router.put('', response_model=PickResponseFull)
 async def make_pick(
         pick_upsert_input: PickUpdate,
         db: Session = Depends(dependencies.get_db),
@@ -91,7 +91,16 @@ async def make_pick(
         game_id=pick_model.game_id,
         week_num=pick_model.week_num,
         player_team_id=pick_model.player_team_id,
-        player_team=PlayerTeamResponse(**pick_model.player_team.__dict__),
+        player_team=PlayerTeamResponse(
+                id=pick_model.player_team.id,
+                league_id=pick_model.player_team.league_id,
+                user_id=pick_model.player_team.user_id,
+                name=pick_model.player_team.name,
+                active=pick_model.player_team.active,
+                paid=pick_model.player_team.paid,
+                streak=pick_model.player_team.streak,
+                current_pick=player_team_service.get_current_pick(db, pick_model.player_team.id)
+            ),
         nfl_team_info=NFLTeamResponse(**pick_model.nfl_team_info.__dict__),
         game=GameResponse(**pick_model.game.__dict__)
     )

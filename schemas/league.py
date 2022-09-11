@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from uuid import UUID
 
@@ -11,8 +12,11 @@ class LeagueBase(BaseModel):
     type_id: UUID
 
 
-class LeagueCreate(LeagueBase):
-    ...
+class LeagueCreate(BaseModel):
+    name: str
+    description: str
+    price: float
+    type_id: Optional[UUID] = None
 
 
 class LeagueUpdate(BaseModel):
@@ -30,7 +34,8 @@ class LeagueInDBBase(LeagueBase):
 
 
 class LeagueResponse(LeagueInDBBase):
-    ...
+    pot: float
+    signup_active: bool
 
 
 class LeagueList(BaseModel):

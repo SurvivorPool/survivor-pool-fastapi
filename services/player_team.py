@@ -2,9 +2,10 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from models import PlayerTeam
+from models import PlayerTeam, Pick
 from models.user import User
 from schemas.player_team import AdminPlayerTeamAdvanceWeek, PlayerTeamCreate, PlayerTeamUpdate
+from services.game import game_service
 import crud
 
 
@@ -18,7 +19,7 @@ class PlayerTeamService:
     def get_by_id(self, db: Session, player_team_id: UUID) -> PlayerTeam:
         return crud.player_team.get(db, player_team_id)
 
-    def get_by_user_id(self, db: Session, user_id: UUID) -> list[PlayerTeam]:
+    def get_by_user_id(self, db: Session, user_id: str) -> list[PlayerTeam]:
         return crud.player_team.get_by_user_id(db, user_id)
 
     def get_active_teams(self, db: Session) -> list[PlayerTeam]:
@@ -41,11 +42,6 @@ class PlayerTeamService:
 
     def update_player_team(self, db: Session, player_team_id: UUID, player_team_input: PlayerTeamUpdate, current_user: User):
         player_team_model = crud.player_team.get(db, player_team_id)
-        if not player_team_model:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player team not found")
-
-        if player_team_model.user_id != current_user.id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot update team for another user")
 
         player_team_update_model = crud.player_team.update(db, db_obj=player_team_model, obj_in=player_team_input)
         return player_team_update_model
@@ -70,6 +66,20 @@ class PlayerTeamService:
             streak=player_team.streak + 1
         )
         return crud.player_team.update(db=db, db_obj=player_team, obj_in=player_team_update_input)
+
+    def get_current_pick(self, db, player_team_id: UUID):
+        max_week = game_service.get_max_week(db)
+        current_pick = db.query(Pick).filter_by(player_team_id=player_team_id, week_num=max_week).first()
+        return current_pick.nfl_team_name if current_pick else ""
+
+    def get_current_pick_public(self, db, player_team_id: UUID):
+        max_week = game_service.get_max_week(db)
+        current_pick = db.query(Pick).filter_by(player_team_id=player_team_id, week_num=max_week).first()
+        if current_pick:
+            game = game_service.get_by_id(db, current_pick.game_id)
+            if game.quarter == 'P':
+                current_pick = ''
+        return current_pick.nfl_team_name if current_pick else ""
 
 
 

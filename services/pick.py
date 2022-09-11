@@ -12,7 +12,6 @@ class PickService:
 
     def make_pick(self, db: Session, player_team_id: UUID, game_id: UUID, nfl_team_name: str) -> Pick:
         week_num = game_service.get_max_week(db)
-        print(week_num)
         pick_model = crud.pick.get_weekly_pick(db, player_team_id, week_num)
 
         if not pick_model:
