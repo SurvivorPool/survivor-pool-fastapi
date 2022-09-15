@@ -50,6 +50,7 @@ class GameResponseFull(GameInDBBase):
     stadium: StadiumResponse
     home_team_info: NFLTeamResponse
     away_team_info: NFLTeamResponse
+    has_started: bool
 
 
 

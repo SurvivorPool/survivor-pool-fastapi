@@ -46,7 +46,7 @@ class GameService:
             home_team_score = home_team['score'] or 0
             away_team_score = away_team['score'] or 0
 
-            if status['period'] == 0 and game_type['state'] == 'pre':
+            if game_type['state'] == 'pre':
                 quarter = 'P'
             elif game_type['state'] == 'post':
                 quarter = 'F'

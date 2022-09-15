@@ -42,6 +42,7 @@ async def games(db: Session = Depends(dependencies.get_db)):
             stadium=stadium_model,
             home_team_info=NFLTeamResponse(**game_model.home_team_info.__dict__),
             away_team_info=NFLTeamResponse(**game_model.away_team_info.__dict__),
+            has_started=game_model.quarter != 'P'
         )
 
         game_responses.append(game_response)
