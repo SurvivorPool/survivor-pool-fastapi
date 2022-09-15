@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from schemas.player_team import PlayerTeamResponseFull
+from schemas.player_team_full import PlayerTeamResponseFull
 from schemas.league_type import LeagueTypeResponse
 from schemas.league import LeagueResponse
 

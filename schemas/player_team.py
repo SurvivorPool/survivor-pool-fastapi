@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from uuid import UUID
+
+from schemas.pick import PickResponse
 from schemas.user import UserResponse
 from schemas.league import LeagueResponse
 
@@ -41,15 +43,6 @@ class PlayerTeamInDBBase(PlayerTeamBase):
 
 class PlayerTeamResponse(PlayerTeamInDBBase):
     current_pick: str
-
-
-class PlayerTeamResponseFull(PlayerTeamResponse):
-    user: UserResponse
-    league: LeagueResponse
-
-
-class PlayerTeamList(BaseModel):
-    teams: list[PlayerTeamResponseFull]
 
 
 class AdvanceWeekResponse(BaseModel):

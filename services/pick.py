@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
-from models import Game, Pick
+from models import Pick
 from models.player_team import PlayerTeam
 from schemas.pick import PickCreate, PickUpdate
 from services.game import game_service
@@ -41,6 +41,12 @@ class PickService:
 
     def get_all_picks(self, db: Session):
         return crud.pick.get_all_picks(db)
+
+    def get_previous_picks(self, db: Session, player_team: PlayerTeam) -> [Pick]:
+        current_week = game_service.get_max_week(db)
+        previous_picks = filter(lambda pick: pick.week_num != current_week, player_team.picks)
+        return previous_picks
+
 
 
 pick_service = PickService()

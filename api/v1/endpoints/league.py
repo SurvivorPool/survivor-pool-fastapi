@@ -5,9 +5,11 @@ from api import dependencies
 from schemas.league import LeagueCreate, LeagueUpdate, LeagueResponse
 from schemas.league_full import LeagueResponseFull, LeagueListFull
 from schemas.league_type import LeagueTypeResponse
-from schemas.player_team import PlayerTeamResponseFull
+from schemas.pick import PickResponse
+from schemas.player_team_full import PlayerTeamResponseFull
 from schemas.user import UserResponse
 from services.league import league_service
+from services.pick import pick_service
 from services.player_team import player_team_service
 
 authenticated_router = APIRouter(
@@ -60,8 +62,14 @@ def get_leagues(db: Session = Depends(dependencies.get_db)):
                         type_id=player_team.league.type_id,
                         pot=len(player_team.league.teams) * player_team.league.price,
                         signup_active=(not league_service.has_league_started(db, player_team.league_id))
-                    )
-            )
+                    ),
+                    pick_history=[PickResponse(
+                        id=pick.id,
+                        player_team_id=pick.player_team_id,
+                        game_id=pick.game_id,
+                        nfl_team_name=pick.nfl_team_name,
+                    ) for pick in pick_service.get_previous_picks(db, player_team)]
+                )
                 for player_team in league_model.teams]
         )
         league_responses.append(league_response)
@@ -90,26 +98,32 @@ def get_leagues_for_user(user_id: str, db: Session = Depends(dependencies.get_db
             signup_active=(not league_service.has_league_started(db, league_model.id)),
             league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
             teams=[PlayerTeamResponseFull(
-            id=player_team.id,
-            league_id=player_team.league_id,
-            user_id=player_team.user_id,
-            name=player_team.name,
-            active=player_team.active,
-            paid=player_team.paid,
-            streak=player_team.streak,
-            current_pick=player_team_service.get_current_pick_public(db, player_team.id),
-            user=UserResponse(**player_team.user.__dict__),
-            league=LeagueResponse(
-                id=player_team.league.id,
-                name=player_team.league.name,
-                description=player_team.league.description,
-                price=player_team.league.price,
-                start_week=player_team.league.start_week,
-                completed=player_team.league.completed,
-                type_id=player_team.league.type_id,
-                pot=len(player_team.league.teams) * player_team.league.price,
-                signup_active=(not league_service.has_league_started(db, player_team.league_id)))
-            ) for player_team in league_model.teams]
+                id=player_team.id,
+                league_id=player_team.league_id,
+                user_id=player_team.user_id,
+                name=player_team.name,
+                active=player_team.active,
+                paid=player_team.paid,
+                streak=player_team.streak,
+                current_pick=player_team_service.get_current_pick_public(db, player_team.id),
+                user=UserResponse(**player_team.user.__dict__),
+                pick_history=[PickResponse(
+                    id=pick.id,
+                    player_team_id=pick.player_team_id,
+                    game_id=pick.game_id,
+                    nfl_team_name=pick.nfl_team_name,
+                ) for pick in pick_service.get_previous_picks(db, player_team)],
+                league=LeagueResponse(
+                    id=player_team.league.id,
+                    name=player_team.league.name,
+                    description=player_team.league.description,
+                    price=player_team.league.price,
+                    start_week=player_team.league.start_week,
+                    completed=player_team.league.completed,
+                    type_id=player_team.league.type_id,
+                    pot=len(player_team.league.teams) * player_team.league.price,
+                    signup_active=(not league_service.has_league_started(db, player_team.league_id)))
+            ) for player_team in league_model.teams],
         )
         league_responses.append(league_response)
 
@@ -155,8 +169,15 @@ def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
                 completed=player_team.league.completed,
                 type_id=player_team.league.type_id,
                 pot=len(player_team.league.teams) * player_team.league.price,
-                signup_active=(not league_service.has_league_started(db, player_team.league_id)))
-            ) for player_team in league_model.teams]
+                signup_active=(not league_service.has_league_started(db, player_team.league_id))
+            ),
+            pick_history=[PickResponse(
+                id=pick.id,
+                player_team_id=pick.player_team_id,
+                game_id=pick.game_id,
+                nfl_team_name=pick.nfl_team_name,
+            ) for pick in pick_service.get_previous_picks(db, player_team)]
+        ) for player_team in league_model.teams]
     )
 
     return league_response
@@ -203,7 +224,13 @@ def create_league(league_create_input: LeagueCreate, db: Session = Depends(depen
                 type_id=player_team.league.type_id,
                 pot=len(player_team.league.teams) * player_team.league.price,
                 signup_active=(not league_service.has_league_started(db, player_team.league_id))
-            )
+            ),
+            pick_history=[PickResponse(
+                id=pick.id,
+                player_team_id=pick.player_team_id,
+                game_id=pick.game_id,
+                nfl_team_name=pick.nfl_team_name,
+            ) for pick in pick_service.get_previous_picks(db, player_team)]
         ) for player_team in league_model.teams]
     )
 
@@ -220,17 +247,17 @@ def update_league(league_update_input: LeagueUpdate, db: Session = Depends(depen
             detail=e.args
         )
     league_response = LeagueResponseFull(
-            id=league_model.id,
-            name=league_model.name,
-            description=league_model.description,
-            price=league_model.price,
-            start_week=league_model.start_week,
-            completed=league_model.completed,
-            type_id=league_model.type_id,
-            pot=len(league_model.teams) * league_model.price,
-            signup_active=(not league_service.has_league_started(db, league_model.id)),
-            league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
-            teams=[PlayerTeamResponseFull(
+        id=league_model.id,
+        name=league_model.name,
+        description=league_model.description,
+        price=league_model.price,
+        start_week=league_model.start_week,
+        completed=league_model.completed,
+        type_id=league_model.type_id,
+        pot=len(league_model.teams) * league_model.price,
+        signup_active=(not league_service.has_league_started(db, league_model.id)),
+        league_type=LeagueTypeResponse(**league_model.league_type.__dict__),
+        teams=[PlayerTeamResponseFull(
             id=player_team.id,
             league_id=player_team.league_id,
             user_id=player_team.user_id,
@@ -249,7 +276,14 @@ def update_league(league_update_input: LeagueUpdate, db: Session = Depends(depen
                 completed=player_team.league.completed,
                 type_id=player_team.league.type_id,
                 pot=len(player_team.league.teams) * player_team.league.price,
-                signup_active=(not league_service.has_league_started(db, player_team.league_id)))
-            ) for player_team in league_model.teams]
-        )
+                signup_active=(not league_service.has_league_started(db, player_team.league_id))
+            ),
+            pick_history=[PickResponse(
+                id=pick.id,
+                player_team_id=pick.player_team_id,
+                game_id=pick.game_id,
+                nfl_team_name=pick.nfl_team_name,
+            ) for pick in pick_service.get_previous_picks(db, player_team)]
+        ) for player_team in league_model.teams]
+    )
     return league_response
