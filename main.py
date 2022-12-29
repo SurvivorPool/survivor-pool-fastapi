@@ -29,7 +29,8 @@ app.add_middleware(
    allow_methods=allow_all,
    allow_headers=allow_all
 )
-app.add_middleware(DBSessionMiddleware, db_url=settings.SQLALCHEMY_DATABASE_URI)
+
+app.add_middleware(DBSessionMiddleware, db_url=settings.get_database_url())
 app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 app.include_router(graphql_app, prefix="/graphql", tags=["graphql"])
 app.include_router(admin_message.admin_router)

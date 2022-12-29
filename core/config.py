@@ -12,19 +12,22 @@ class Settings(BaseSettings):
     GOOGLE_APPLICATION_CREDENTIALS: str
     SECRET_KEY = "super-secret-secret-key"
     ALGORITHM = "HS256"
-    uri = os.getenv("DATABASE_URL")  # or other relevant config var
-    
-    if uri and uri.startswith("postgres://"):
-        uri = uri.replace("postgres://", "postgresql://", 1)
-
     class Config:
         case_sensitive = True
         env_file = ".env"
         fields = {
             "SQLALCHEMY_DATABASE_URI": {
-                "env": uri
+                "env": "DATABASE_URL"
             }
         }
+
+    def get_database_url(self):
+        database_uri = self.SQLALCHEMY_DATABASE_URI
+        if database_uri and database_uri.startswith("postgres://"):
+            database_uri = database_uri.replace("postgres://", "postgresql://", 1)
+            settings.SQLALCHEMY_DATABASE_URI = database_uri
+        return self.SQLALCHEMY_DATABASE_URI
+    
 
 
 settings = Settings()

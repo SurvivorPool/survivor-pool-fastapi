@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 from alembic import context
+import os
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 
@@ -25,7 +26,7 @@ target_metadata = Base.metadata
 
 
 def get_url():
-    return settings.SQLALCHEMY_DATABASE_URI
+    return settings.get_database_url() 
 
 
 def run_migrations_offline():
