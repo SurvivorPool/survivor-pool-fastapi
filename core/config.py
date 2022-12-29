@@ -16,7 +16,7 @@ class Settings(BaseSettings):
         case_sensitive = True
         env_file = ".env"
         fields = {
-            "SQLALCHEMY_DATABASE_URI": {
+            "DATABASE_URL": {
                 "env": "DATABASE_URL"
             }
         }
