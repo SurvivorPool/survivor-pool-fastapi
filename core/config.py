@@ -11,12 +11,13 @@ class Settings(BaseSettings):
     GOOGLE_APPLICATION_CREDENTIALS: str
     SECRET_KEY = "super-secret-secret-key"
     ALGORITHM = "HS256"
+    
 
     class Config:
         case_sensitive = True
         env_file = ".env"
         fields = {
-            "DATABASE_URL": {
+            "SQLALCHEMY_DATABASE_URI": {
                 "env": "DATABASE_URL"
             }
         }
