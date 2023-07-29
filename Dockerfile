@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.10
+FROM public.ecr.aws/docker/library/python:3.10
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY requirements.txt requirements.txt
