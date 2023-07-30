@@ -9,7 +9,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: Optional[str]
-    GOOGLE_APPLICATION_CREDENTIALS: Optional[str]
+    GOOGLE_APPLICATION_CREDENTIALS: str
     SECRET_KEY = "super-secret-secret-key"
     ALGORITHM = "HS256"
     class Config:
