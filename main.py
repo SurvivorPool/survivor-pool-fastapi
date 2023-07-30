@@ -16,7 +16,6 @@ class Query:
     def hello(self) -> str:
         return "Hello World!"
 
-
 schema = strawberry.Schema(Query)
 graphql_app = GraphQLRouter(schema)
 

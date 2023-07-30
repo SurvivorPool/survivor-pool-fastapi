@@ -1,6 +1,9 @@
 ---
 version: 0.2
-
+env:
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS
+    SQLALCHEMY_DATABASE_URI: $SQLALCHEMY_DATABASE_URI
 phases:
   pre_build:
     commands:
