@@ -15,7 +15,9 @@ from services.user import user_service
 from db.session import SessionLocal
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/google/callback')
-
+print("HERE HERE HERE HERE HERE")
+print(settings.GOOGLE_APPLICATION_CREDENTIALS)
+print("HERE HERE HERE HERE HERE")
 key_dict = json.loads(
     settings.GOOGLE_APPLICATION_CREDENTIALS
 )
