@@ -15,3 +15,12 @@ class User(Base):
     wins = Column(Integer, server_default="0", default=0, nullable=False)
 
     teams = relationship("PlayerTeam", back_populates="user")
+
+    def __init__(self, id, full_name, email, is_admin, picture_url, receive_notifications, wins):
+        self.id = id
+        self.full_name = full_name
+        self.email = email
+        self.is_admin = is_admin
+        self.picture_url = picture_url
+        self.receive_notifications = receive_notifications
+        self.wins = wins
