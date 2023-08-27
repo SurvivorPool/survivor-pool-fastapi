@@ -1,24 +1,12 @@
-import json
 from typing import Generator
-
-import firebase_admin
-from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordBearer
-from firebase_admin import auth
-from firebase_admin.credentials import Certificate
+from fastapi import Depends, HTTPException, status, Request, Header
 from sqlalchemy.orm import Session
-from jose import jwt, JWTError
-from core.config import settings
+import jwt
 from models import User
-from services.user import user_service
-from fastapi_cognito import CognitoAuth, CognitoSettings, CognitoToken
+import requests
 
 from db.session import SessionLocal
 from core.config import settings
-
-cognito_us = CognitoAuth(
-  settings=CognitoSettings.from_global_settings(settings), userpool_name="us"
-)
 
 def get_db() -> Generator:
     db = SessionLocal()
@@ -30,21 +18,44 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_current_user(auth: CognitoToken = Depends(cognito_us.auth_required), db: Session = Depends(get_db)) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+async def get_cognito_public_key(kid):
+    cognito_jwks_url = settings.COGNITO_URL
+    # cognito_jwks_url = cognito_jwks_url.format(region="us-east-1", userPoolId="us-east-1_3p6b7Ig1l")
+    jwks = requests.get(cognito_jwks_url).json()
+    for key in jwks["keys"]:
+        if key["kid"] == kid:
+            return key
+    return None
 
-    user_id = auth.cognito_id
-    if user_id is None:
-        raise credentials_exception
 
-    user = user_service.get_by_id(db, user_id)
-    if user is None:
-        raise credentials_exception
-    return user
+async def get_current_user(Authorization:  str = Header(...), db: Session = Depends(get_db)) -> User:
+    # credentials_exception = HTTPException(
+    #     status_code=status.HTTP_401_UNAUTHORIZED,
+    #     detail="Could not validate credentials",
+    #     headers={"WWW-Authenticate": "Bearer"},
+    # )
+    #
+    # user_id = auth.cognito_id
+    # if user_id is None:
+    #     raise credentials_exception
+    #
+    # user = user_service.get_by_id(db, user_id)
+    # if user is None:
+    #     raise credentials_exception
+    # return user
+    try:
+        decoded_token = jwt.decode(Authorization, options={"verify_signature": False})
+        kid = decoded_token.get("kid")
+        public_key = await get_cognito_public_key(kid)
+        if public_key:
+            decoded_token = jwt.decode(Authorization, public_key, algorithms=["RS256"], audience="your_app_client_id")
+            return decoded_token
+        else:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.DecodeError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 
 def get_admin_user(current_user=Depends(get_current_user)):

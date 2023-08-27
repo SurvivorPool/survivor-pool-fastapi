@@ -12,10 +12,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra=Extra.ignore)
     SQLALCHEMY_DATABASE_URI: Optional[str]
     SECRET_KEY: str
-    check_expiration: bool = True
-    jwt_header_prefix: str = "Bearer"
-    jwt_header_name: str = "Authorization"
-    userpools: Dict[str, dict[str, Any]]
+    COGNITO_URL: str
 
 
     def get_database_url(self):
