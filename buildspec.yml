@@ -20,8 +20,10 @@ phases:
       - "echo Build completed on `date`"
       - "echo Pushing the Docker image..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - export SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
-      - docker run -d --name $IMAGE_REPO_NAME $IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo $SQLALCHEMY_DATABASE_URI
+      - echo $SECRET_KEY
+      - echo $userpools
+      - docker run -d --name $IMAGE_REPO_NAME $IMAGE_REPO_NAME:$IMAGE_TAG -e SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI -e SECRET_KEY=$SECRET_KEY -e userpools=$userpools
       - docker exec $IMAGE_REPO_NAME alembic upgrade head
       - docker stop $IMAGE_REPO_NAME
 artifacts:
