@@ -22,8 +22,8 @@ phases:
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - pip3 install alembic psycopg2-binary pydantic-settings
       - export SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
-      - docker run -d --name $IMAGE_REPO_NAME:$IMAGE_TAG $IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker run -d --name $IMAGE_REPO_NAME $IMAGE_REPO_NAME:$IMAGE_TAG
       - docker exec $IMAGE_REPO_NAME:$IMAGE_TAG alembic upgrade head
-      - docker stop $IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker stop $IMAGE_REPO_NAME
 artifacts:
   files: imagedefinitions.json
