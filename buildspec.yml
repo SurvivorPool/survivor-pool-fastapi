@@ -13,16 +13,16 @@ phases:
     commands:
       - "echo Build started on `date`"
       - "echo Building the Docker image..."
-      - docker build  -t $IMAGE_REPO_NAME:$IMAGE_TAG . 
+      - export SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
+      - export SECRET_KEY=$SECRET_KEY
+      - export userpools=$userpools
+      - docker build  -t $IMAGE_REPO_NAME:$IMAGE_TAG .
       - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
   post_build:
     commands:
       - "echo Build completed on `date`"
       - "echo Pushing the Docker image..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - export SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
-      - export SECRET_KEY=$SECRET_KEY
-      - export userpools=$userpools
       - pip3 install alembic psycopg2-binary pydantic-settings
       - alembic upgrade head
 artifacts:
