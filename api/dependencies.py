@@ -11,15 +11,14 @@ from jose import jwt, JWTError
 from core.config import settings
 from models import User
 from services.user import user_service
+from fastapi_cognito import CognitoAuth, CognitoSettings, CognitoToken
 
 from db.session import SessionLocal
+from core.config import settings
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/google/callback')
-key_dict = json.loads(
-    settings.GOOGLE_APPLICATION_CREDENTIALS
+cognito_us = CognitoAuth(
+  settings=CognitoSettings.from_global_settings(settings), userpool_name="us"
 )
-
-firebase_admin.initialize_app(Certificate(key_dict))
 
 def get_db() -> Generator:
     db = SessionLocal()
@@ -31,28 +30,17 @@ def get_db() -> Generator:
         db.close()
 
 
-def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
+def get_current_user(auth: CognitoToken = Depends(cognito_us.auth_required), db: Session = Depends(get_db)) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    if 'auth' not in request.headers:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing auth header"
-        )
-
-    auth_header = request.headers['auth']
-    try:
-        payload = auth.verify_id_token(auth_header)
-        user_id = payload.get('sub')
-
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
+    user_id = auth.cognito_id
+    if user_id is None:
         raise credentials_exception
+
     user = user_service.get_by_id(db, user_id)
     if user is None:
         raise credentials_exception
