@@ -23,7 +23,7 @@ phases:
       - echo $SQLALCHEMY_DATABASE_URI
       - echo $SECRET_KEY
       - echo $userpools
-      - docker run -d --name $IMAGE_REPO_NAME -e SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI} -e SECRET_KEY=${SECRET_KEY} -e userpools=${userpools} $IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker run -d --name $IMAGE_REPO_NAME -e SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI -e SECRET_KEY=$SECRET_KEY -e userpools=$userpools $IMAGE_REPO_NAME:$IMAGE_TAG
       - docker exec $IMAGE_REPO_NAME alembic upgrade head
       - docker stop $IMAGE_REPO_NAME
 artifacts:
