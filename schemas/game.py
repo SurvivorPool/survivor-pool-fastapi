@@ -38,7 +38,7 @@ class GameUpdate(BaseModel):
 
 class GameInDBBase(GameBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class GameResponse(GameInDBBase):

@@ -36,7 +36,7 @@ class UserMessageInDBBase(UserMessageBase):
     read_date: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserMessageResponse(UserMessageInDBBase):

@@ -18,7 +18,7 @@ class StadiumUpdate(StadiumBase):
 
 class StadiumInDBBase(StadiumBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class StadiumResponse(StadiumInDBBase):

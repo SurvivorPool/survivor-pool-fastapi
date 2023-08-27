@@ -22,7 +22,7 @@ class NFLTeamUpdate(NFLTeamBase):
 
 class NFLTeamInDBBase(NFLTeamBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class NFLTeamResponse(NFLTeamInDBBase):
