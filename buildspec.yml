@@ -20,7 +20,7 @@ phases:
       - "echo Build completed on `date`"
       - "echo Pushing the Docker image..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - pip3 install alembic psycopg2-binary
+      - pip3 install alembic psycopg2-binary pydantic-settings
       - export SQLALCHEMY_DATABASE_URI=$SQLALCHEMY_DATABASE_URI
       - alembic upgrade head
 artifacts:
