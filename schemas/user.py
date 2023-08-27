@@ -6,7 +6,6 @@ class UserBase(BaseModel):
     full_name: str
     email: str
     is_admin: bool
-    picture_url: HttpUrl
     receive_notifications: bool
     wins: int
 
@@ -19,7 +18,6 @@ class UserCreate(BaseModel):
     id: str
     email: str
     full_name: str
-    picture_url: str
     receive_notifications: bool
 
 

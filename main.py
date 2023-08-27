@@ -23,10 +23,10 @@ app = FastAPI()
 allow_all = ['*']
 app.add_middleware(
    CORSMiddleware,
-   allow_origins=allow_all,
+   allow_origins=[""],
    allow_credentials=True,
-   allow_methods=allow_all,
-   allow_headers=allow_all
+   allow_methods=["*"],
+   allow_headers=["*"],
 )
 
 app.add_middleware(DBSessionMiddleware, db_url=settings.get_database_url())
