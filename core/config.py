@@ -12,7 +12,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra=Extra.ignore)
     SQLALCHEMY_DATABASE_URI: Optional[str]
     SECRET_KEY: str
-    COGNITO_URL: str
     check_expiration: bool = True
     jwt_header_prefix: str = "Bearer"
     jwt_header_name: str = "Authorization"
