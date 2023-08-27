@@ -23,10 +23,10 @@ app = FastAPI()
 allow_all = ['*']
 app.add_middleware(
    CORSMiddleware,
-   allow_origins=[""],
+   allow_origins=allow_all,
    allow_credentials=True,
-   allow_methods=["*"],
-   allow_headers=["*"],
+   allow_methods=allow_all,
+   allow_headers=allow_all,
 )
 
 app.add_middleware(DBSessionMiddleware, db_url=settings.get_database_url())
@@ -54,6 +54,3 @@ app.include_router(user.admin_router)
 @app.get("/")
 async def root():
     return {"message": "Hello World!!!!"}
-
-
-
