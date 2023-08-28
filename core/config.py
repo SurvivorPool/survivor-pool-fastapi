@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: Optional[str]
     SECRET_KEY: str
     COGNITO_URL: str
+    COGNITO_CLIENT_ID: str
 
 
     def get_database_url(self):
