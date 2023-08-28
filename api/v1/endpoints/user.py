@@ -1,13 +1,13 @@
-from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api import dependencies
 from models import User
 from schemas.player_team import PlayerTeamResponse
-from schemas.user import UserUpdate, UserExistsCheckResponse, UserCreate
+from schemas.user import UserUpdate, UserExistsCheckResponse, UserCreate, UserUpdateAdmin
 from schemas.user_full import UserResponseFull, UsersListFull
 from services.player_team import player_team_service
 from services.user import user_service
+from core.config import settings
 
 authorized_router = APIRouter(
     prefix='/users',
@@ -38,6 +38,10 @@ def check_user_existence(user_id: str, db: Session = Depends(dependencies.get_db
 @unauthorized_router.post('', response_model=UserResponseFull)
 def create_user(user_create_input: UserCreate, db: Session = Depends(dependencies.get_db)):
     user_model = user_service.create(db, user_create_input)
+    if user_model.email in settings.ADMIN_EMAILS.split(","):
+        update_user_admin = UserUpdateAdmin(is_admin=True)
+        user_service.update_user_admin(db, user_model, update_user_admin)
+
     return UserResponseFull(
         id=user_model.id,
         full_name=user_model.full_name,

@@ -2,7 +2,7 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 import crud
 from models import User
-from schemas.user import UserUpdate, UserCreate
+from schemas.user import UserUpdate, UserCreate, UserUpdateAdmin
 
 
 class UserService:
@@ -20,6 +20,15 @@ class UserService:
             db: Session,
             existing_model: User,
             user_update_input: UserUpdate
+    ):
+        user_model = crud.user.update(db, db_obj=existing_model, obj_in=user_update_input)
+        return user_model
+
+    def update_user_admin (
+            self,
+            db: Session,
+            existing_model: User,
+            user_update_input: UserUpdateAdmin
     ):
         user_model = crud.user.update(db, db_obj=existing_model, obj_in=user_update_input)
         return user_model

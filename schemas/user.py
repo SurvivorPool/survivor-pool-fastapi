@@ -25,6 +25,9 @@ class UserCreate(BaseModel):
 class UserUpdate(BaseModel):
     receive_notifications: bool
 
+class UserUpdateAdmin(BaseModel):
+    is_admin: bool
+
 
 # Properties shared by models stored in DB
 class UserInDBBase(UserBase):
