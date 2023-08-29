@@ -23,7 +23,5 @@ phases:
       - "echo Build completed on `date`"
       - "echo Pushing the Docker image..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - pip3 install alembic psycopg2-binary pydantic-settings
-      - alembic upgrade head
 artifacts:
   files: imagedefinitions.json

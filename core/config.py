@@ -2,7 +2,7 @@ import pathlib
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Extra
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, List
 
 # Project Directories
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     COGNITO_URL: str
     COGNITO_CLIENT_ID: str
+    ADMIN_EMAILS: str
 
 
     def get_database_url(self):
