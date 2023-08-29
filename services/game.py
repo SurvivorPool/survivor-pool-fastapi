@@ -100,8 +100,8 @@ class GameService:
                     if 'details' in odds[0] and 'overUnder' in odds[0]:
                         odds_create = OddsCreate(
                             id=game_id,
-                            details=odds[0]['details'],
-                            over_under=odds[0]['overUnder']
+                            details=odds['details'],
+                            over_under=odds['overUnder']
                         )
                         crud.odds.create(db, obj_in=odds_create)
                 else:
