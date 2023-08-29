@@ -7,18 +7,18 @@ from schemas.stadium import StadiumCreate
 
 
 class StadiumService:
-    nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
+    nfl_endpoint = 'https://site.api.espn.com/apis/v2/scoreboard/header?sport=football&league=nfl&lang=en&region=us&contentorigin=espn&tz=America%2FNew_York'
 
     async def update_stadiums(self, db: Session, rss_feed: Response = None):
         if rss_feed is None:
             rss_feed = httpx.get(self.nfl_endpoint)
 
-        json = rss_feed.json()
+        json = rss_feed.json()['sports'][0]['leagues'][0]
 
         events = json['events']
 
         for event in events:
-            competitions = event['competitions']
+            competitions = event['competitors']
             competition = competitions[0]
 
             stadium_info = competition['venue']

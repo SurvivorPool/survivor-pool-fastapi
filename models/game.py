@@ -14,10 +14,8 @@ class Game(Base):
     quarter = Column(String)
     quarter_time = Column(String)
     week = Column(Integer)
-    stadium_id = Column(Integer, ForeignKey("stadium.id"), nullable=False)
     odds_id = Column(Integer, ForeignKey("odds.id"))
 
     home_team_info = relationship("NFLTeam", foreign_keys=[home_team_name])
     away_team_info = relationship("NFLTeam", foreign_keys=[away_team_name])
-    stadium_info = relationship("Stadium")
     odds_info = relationship("Odds")
