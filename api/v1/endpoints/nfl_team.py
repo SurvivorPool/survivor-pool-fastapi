@@ -7,7 +7,7 @@ from schemas.nfl_team import NFLTeamResponse, NFLTeamList
 authorized_router = APIRouter(
     prefix="/nfl_teams",
     tags=["nfl teams"],
-    dependencies=[Depends(dependencies.get_current_user)]
+    # dependencies=[Depends(dependencies.get_current_user)]
 )
 
 
