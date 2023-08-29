@@ -97,7 +97,7 @@ class GameService:
                 odds_model = crud.odds.get(db, game_id)
 
                 if odds_model is None:
-                    if 'details' in odds[0] and 'overUnder' in odds[0]:
+                    if 'details' in odds and 'overUnder' in odds:
                         odds_create = OddsCreate(
                             id=game_id,
                             details=odds['details'],
