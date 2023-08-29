@@ -7,19 +7,18 @@ from schemas.nfl_team import NFLTeamCreate
 
 
 class NFLTeamService:
-    nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
+    nfl_endpoint = 'https://site.api.espn.com/apis/v2/scoreboard/header?sport=football&league=nfl&lang=en&region=us&contentorigin=espn&tz=America%2FNew_York'
 
     async def update_nfl_teams(self, db: Session, rss_feed: Response = None) -> list[NFLTeam]:
         if rss_feed is None:
             rss_feed = httpx.get(self.nfl_endpoint)
 
-        json = rss_feed.json()
+        json = rss_feed.json()['sports'][0]['leagues'][0]
 
         events = json['events']
 
         for event in events:
-            competitions = event['competitions']
-            teams = competitions[0]['competitors']
+            teams = event['competitors']
 
             home_team = next(filter(lambda team: team['homeAway'] == 'home', teams))
             away_team = next(filter(lambda team: team['homeAway'] == 'away', teams))
@@ -41,18 +40,17 @@ class NFLTeamService:
         return teams
 
     def add_team(self, db: Session, team: dict):
-        team_info = team['team']
         nickname = ''
-        if 'name' not in team_info:
-            nickname = team_info['displayName']
+        if 'name' not in team:
+            nickname = team['displayName']
         else:
-            nickname = team_info['name']
+            nickname = team['name']
 
         team_create = NFLTeamCreate(
             id=team['id'],
-            abbreviation=team_info['abbreviation'],
-            city_state=team_info['location'],
-            full_name=team_info['displayName'],
+            abbreviation=team['abbreviation'],
+            city_state=team['location'],
+            full_name=team['displayName'],
             nickname=nickname
         )
 

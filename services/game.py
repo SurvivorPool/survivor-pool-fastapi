@@ -13,7 +13,7 @@ from services.nfl_team import nfl_team_service
 
 
 class GameService:
-    nfl_endpoint = 'http://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard'
+    nfl_endpoint = 'https://site.api.espn.com/apis/v2/scoreboard/header?sport=football&league=nfl&lang=en&region=us&contentorigin=espn&tz=America%2FNew_York'
 
     def get_by_id(self, db, game_id: int) -> Game:
         return crud.game.get(db, game_id)
@@ -21,23 +21,20 @@ class GameService:
 
     async def update_games(self, db: Session):
         rss_feed = httpx.get(self.nfl_endpoint)
+        json = rss_feed.json()['sports'][0]['leagues'][0]
         await nfl_team_service.update_nfl_teams(db, rss_feed)
-        await stadium_service.update_stadiums(db, rss_feed)
-
-        json = rss_feed.json()
-        week_info = json['week']
-        week_num = week_info['number']
 
         events = json['events']
 
         for event in events:
-            competitions = event['competitions']
-            competition = competitions[0]
-            teams = competition['competitors']
+            teams = event['competitors']
+            week_num = event['week']
 
+            print(teams)
             home_team = next(filter(lambda team: team['homeAway'] == 'home', teams))
+            print(home_team)
             away_team = next(filter(lambda team: team['homeAway'] == 'away', teams))
-            status = event['status']
+            status = event['fullStatus']
             game_type = status['type']
 
             game_id = event['id']
@@ -54,21 +51,20 @@ class GameService:
                 quarter = status['period']
 
             quarter_time = status['displayClock']
-            game_date = parser.parse(competition['startDate'])
+            game_date = parser.parse(event['date'])
             game_date_eastern = game_date - timedelta(hours=5)
             day_of_week = calendar.day_name[game_date_eastern.weekday()]
-            stadium_id = competition['venue']['id']
 
             if game_model is None:
-                if 'name' not in home_team['team']:
-                    home_team_name = home_team['team']['displayName']
+                if 'name' not in home_team:
+                    home_team_name = home_team['displayName']
                 else:
-                    home_team_name = home_team['team']['name']
+                    home_team_name = home_team['name']
 
-                if 'name' not in away_team['team']:
-                    away_team_name = away_team['team']['displayName']
+                if 'name' not in away_team:
+                    away_team_name = away_team['displayName']
                 else:
-                    away_team_name = away_team['team']['name']
+                    away_team_name = away_team['name']
 
                 game_create = GameCreate(
                     id=game_id,
@@ -81,7 +77,6 @@ class GameService:
                     quarter=quarter,
                     quarter_time=quarter_time,
                     week=week_num,
-                    stadium_id=stadium_id
                 )
                 crud.game.create(db=db, obj_in=game_create)
             else:
@@ -93,31 +88,29 @@ class GameService:
                     quarter_time=quarter_time,
                     game_date=game_date,
                     day_of_week=day_of_week,
-                    stadium_id=stadium_id
                 )
                 crud.game.update(db, db_obj=game_model, obj_in=game_update)
 
-            if 'odds' in competition:
-                odds = competition['odds']
+            if event['odds'] is not None:
+                odds = event['odds']
 
-                if odds:
-                    odds_model = crud.odds.get(db, game_id)
+                odds_model = crud.odds.get(db, game_id)
 
-                    if odds_model is None:
-                        if 'details' in odds[0] and 'overUnder' in odds[0]:
-                            odds_create = OddsCreate(
-                                id=game_id,
-                                details=odds[0]['details'],
-                                over_under=odds[0]['overUnder']
-                            )
-                            crud.odds.create(db, obj_in=odds_create)
-                    else:
-                        odds_update = OddsUpdate(
-                            id=odds_model.id,
-                            details=odds[0]['details'],
-                            over_under=odds[0]['overUnder']
+                if odds_model is None:
+                    if 'details' in odds and 'overUnder' in odds:
+                        odds_create = OddsCreate(
+                            id=game_id,
+                            details=odds['details'],
+                            over_under=odds['overUnder']
                         )
-                        crud.odds.update(db, db_obj=odds_model, obj_in=odds_update)
+                        crud.odds.create(db, obj_in=odds_create)
+                else:
+                    odds_update = OddsUpdate(
+                        id=odds_model.id,
+                        details=odds['details'],
+                        over_under=odds['overUnder']
+                    )
+                    crud.odds.update(db, db_obj=odds_model, obj_in=odds_update)
 
     def get_games(self, db: Session) -> list[Game]:
         return crud.game.get_multi(db=db)

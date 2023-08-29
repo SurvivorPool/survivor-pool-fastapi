@@ -4,7 +4,6 @@ from datetime import datetime
 
 from schemas.nfl_team import NFLTeamResponse
 from schemas.odds import OddsResponse
-from schemas.stadium import StadiumResponse
 
 
 class GameBase(BaseModel):
@@ -18,7 +17,6 @@ class GameBase(BaseModel):
     quarter: str
     quarter_time: str
     week: int
-    stadium_id: int
 
 
 class GameCreate(GameBase):
@@ -33,7 +31,6 @@ class GameUpdate(BaseModel):
     quarter_time: str
     game_date: datetime
     day_of_week: str
-    stadium_id: int
 
 
 class GameInDBBase(GameBase):
@@ -47,7 +44,6 @@ class GameResponse(GameInDBBase):
 
 class GameResponseFull(GameInDBBase):
     odds: Optional[OddsResponse]
-    stadium: StadiumResponse
     home_team_info: NFLTeamResponse
     away_team_info: NFLTeamResponse
     has_started: bool

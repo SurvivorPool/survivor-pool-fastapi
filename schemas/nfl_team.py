@@ -8,8 +8,6 @@ class NFLTeamBase(BaseModel):
     city_state: str
     full_name: str
     nickname: str
-    conference: Optional[str]
-    division: Optional[str]
 
 
 class NFLTeamCreate(NFLTeamBase):

@@ -11,7 +11,7 @@ from schemas.game import GameResponseFull, GameList
 authorized_router = APIRouter(
     prefix='/games',
     tags=['games'],
-    dependencies=[Depends(dependencies.get_current_user)]
+    # dependencies=[Depends(dependencies.get_current_user)]
 )
 
 
@@ -24,8 +24,6 @@ async def games(db: Session = Depends(dependencies.get_db)):
     game_responses = []
     for game_model in game_models:
         odds_model = odds_service.get_by_id(db, game_model.id)
-        stadium_model = stadium_service.get_stadium_by_id(db, game_model.stadium_id)
-
         game_response = GameResponseFull(
             id=game_model.id,
             home_team_name=game_model.home_team_name,
@@ -37,9 +35,7 @@ async def games(db: Session = Depends(dependencies.get_db)):
             quarter=game_model.quarter,
             quarter_time=game_model.quarter_time,
             week=game_model.week,
-            stadium_id=game_model.stadium_id,
             odds=odds_model,
-            stadium=stadium_model,
             home_team_info=NFLTeamResponse(**game_model.home_team_info.__dict__),
             away_team_info=NFLTeamResponse(**game_model.away_team_info.__dict__),
             has_started=game_model.quarter != 'P'
