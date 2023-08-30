@@ -28,7 +28,7 @@ phases:
       - pip3 install alembic psycopg2-binary pydantic-settings jq
       - alembic upgrade head
       - |
-        cat <<'EOF' > appspec.json
+        cat <<'EOF' > imagedefinitions.json
         {
           "name": "$APP_NAME-$ENV-container",
           "imageUri": "015085576747.dkr.ecr.us-east-1.amazonaws.com/$APP_NAME-$ENV-repo:latest"
