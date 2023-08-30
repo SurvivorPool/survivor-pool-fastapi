@@ -30,7 +30,6 @@ phases:
       - |
         cat <<'EOF' > appspec.json
         {
-          "version":0.0,
           "name": "$APP_NAME-$ENV-container",
           "imageUri": "015085576747.dkr.ecr.us-east-1.amazonaws.com/$APP_NAME-$ENV-repo:latest"
         }
