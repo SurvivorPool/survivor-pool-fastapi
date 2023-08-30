@@ -6,6 +6,8 @@ env:
     SQLALCHEMY_DATABASE_URI: $SQLALCHEMY_DATABASE_URI
     COGNITO_URL: $COGNITO_URL
     COGNITO_CLIENT_ID: $COGNITO_CLIENT_ID
+    APP_NAME: $APP_NAME
+    ENV: $ENV
 phases:
   pre_build:
     commands:
@@ -23,7 +25,8 @@ phases:
       - "echo Build completed on `date`"
       - "echo Pushing the Docker image..."
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-      - pip3 install alembic psycopg2-binary pydantic-settings
+      - pip3 install alembic psycopg2-binary pydantic-settings jq
       - alembic upgrade head
+      - cat << EOF > imagedefinitions.json '[{"name":"$APP_NAME-$ENV-container", "imageUri": "015085576747.dkr.ecr.us-east-1.amazonaws.com/$APP_NAME-$ENV-repo:latest" } ]' EOF
 artifacts:
   files: imagedefinitions.json
