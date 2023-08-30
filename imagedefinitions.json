@@ -1,6 +1,4 @@
-[
-  {
-    "name": "survivorpool-server-dev-container",
-    "imageUri": "015085576747.dkr.ecr.us-east-1.amazonaws.com/survivorpool-server-dev-repo:latest"
-  }
-]
+[{
+          "name": "$APP_NAME-$ENV-container",
+          "imageUri": "015085576747.dkr.ecr.us-east-1.amazonaws.com/$APP_NAME-$ENV-repo:latest"
+        }]
