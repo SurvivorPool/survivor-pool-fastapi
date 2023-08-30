@@ -29,10 +29,10 @@ phases:
       - alembic upgrade head
       - |
         cat <<'EOF' > imagedefinitions.json
-        {
+        {[{
           "name": "$APP_NAME-$ENV-container",
           "imageUri": "015085576747.dkr.ecr.us-east-1.amazonaws.com/$APP_NAME-$ENV-repo:latest"
-        }
+        }]}
         EOF
 artifacts:
   files: imagedefinitions.json
