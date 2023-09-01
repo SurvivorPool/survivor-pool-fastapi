@@ -86,6 +86,14 @@ def get_leagues_for_user(user_id: str, db: Session = Depends(dependencies.get_db
     league_responses = []
     for player_team in player_teams:
         league_model = player_team.league
+        league_id = league_model.id
+
+        duplicate = [league for league in league_responses if
+                     player_team.league_id == league.id]
+
+        if len(duplicate) > 0:
+            continue
+
         league_response = LeagueResponseFull(
             id=league_model.id,
             name=league_model.name,
