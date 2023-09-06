@@ -28,7 +28,10 @@ admin_router = APIRouter(
 
 
 @authorized_router.get('/{player_team_id}')
-def get_player_team(player_team_id: UUID,db: Session = Depends(dependencies.get_db)):
+def get_player_team(player_team_id: UUID,
+                    db: Session = Depends(dependencies.get_db),
+                    current_user: User = Depends(dependencies.get_current_user)
+):
     player_team_model = player_team_service.get_by_id(db, player_team_id)
 
     if not player_team_model:
@@ -43,7 +46,7 @@ def get_player_team(player_team_id: UUID,db: Session = Depends(dependencies.get_
         paid=player_team_model.paid,
         streak=player_team_model.streak,
         user=UserResponse(**player_team_model.user.__dict__),
-        current_pick=player_team_service.get_current_pick(db, player_team_model.id),
+        current_pick=  player_team_service.get_current_pick(db, player_team_model.id) if player_team_model.user_id == current_user.id else player_team_service.get_current_pick_public(db, player_team_model.id),
         league=LeagueResponse(
             id=player_team_model.league.id,
             name=player_team_model.league.name,

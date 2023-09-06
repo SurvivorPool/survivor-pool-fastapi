@@ -35,20 +35,6 @@ async def get_cognito_public_key(kid):
 
 
 async def get_current_user(authorization:  str = Header(...), db: Session = Depends(get_db)) -> User:
-    # credentials_exception = HTTPException(
-    #     status_code=status.HTTP_401_UNAUTHORIZED,
-    #     detail="Could not validate credentials",
-    #     headers={"WWW-Authenticate": "Bearer"},
-    # )
-    #
-    # user_id = auth.cognito_id
-    # if user_id is None:
-    #     raise credentials_exception
-    #
-    # user = user_service.get_by_id(db, user_id)
-    # if user is None:
-    #     raise credentials_exception
-    # return user
     try:
         token = authorization.split(" ")[1]  # Extract the token part after "Bearer"
         decoded_token = jwt.get_unverified_header(token)
