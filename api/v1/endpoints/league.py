@@ -2,6 +2,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from api import dependencies
+from models import User
 from schemas.league import LeagueCreate, LeagueUpdate, LeagueResponse
 from schemas.league_full import LeagueResponseFull, LeagueListFull
 from schemas.league_type import LeagueTypeResponse
@@ -141,7 +142,7 @@ def get_leagues_for_user(user_id: str, db: Session = Depends(dependencies.get_db
 
 
 @authenticated_router.get('/{league_id}')
-def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
+def get_league(league_id: UUID, current_user: User = Depends(dependencies.get_current_user), db: Session = Depends(dependencies.get_db)):
     league_model = league_service.get_by_id(db, league_id)
 
     if not league_model:
@@ -167,7 +168,7 @@ def get_league(league_id: UUID, db: Session = Depends(dependencies.get_db)):
             paid=player_team.paid,
             streak=player_team.streak,
             user=UserResponse(**player_team.user.__dict__),
-            current_pick=player_team_service.get_current_pick_public(db, player_team.id),
+            current_pick=player_team_service.get_current_pick(db, player_team.id) if player_team.user_id == current_user.id else player_team_service.get_current_pick_public( db, player_team.id),
             league=LeagueResponse(
                 id=player_team.league.id,
                 name=player_team.league.name,
