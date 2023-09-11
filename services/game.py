@@ -30,9 +30,7 @@ class GameService:
             teams = event['competitors']
             week_num = event['week']
 
-            print(teams)
             home_team = next(filter(lambda team: team['homeAway'] == 'home', teams))
-            print(home_team)
             away_team = next(filter(lambda team: team['homeAway'] == 'away', teams))
             status = event['fullStatus']
             game_type = status['type']
@@ -48,7 +46,7 @@ class GameService:
             elif game_type['state'] == 'post':
                 quarter = 'F'
             else:
-                quarter = status['period']
+                quarter = game_type['state']
 
             quarter_time = status['displayClock']
             game_date = parser.parse(event['date'])
