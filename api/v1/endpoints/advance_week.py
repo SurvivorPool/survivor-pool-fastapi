@@ -16,8 +16,8 @@ admin_router = APIRouter(
 
 
 @admin_router.put('', response_model=AdvanceWeekResponse)
-def advance_week(db: Session = Depends(dependencies.get_db)):
-    # await game_service.update_games(db)
+async def advance_week(db: Session = Depends(dependencies.get_db)):
+    await game_service.update_games(db)
 
     week_num = game_service.get_max_week(db)
     game_models = game_service.get_games_by_week(db, week_num)
