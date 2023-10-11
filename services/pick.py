@@ -45,6 +45,7 @@ class PickService:
     def get_previous_picks(self, db: Session, player_team: PlayerTeam) -> [Pick]:
         current_week = game_service.get_max_week(db)
         previous_picks = filter(lambda pick: pick.week_num != current_week, player_team.picks)
+        previous_picks = sorted(previous_picks, key=lambda pick: pick.week_num)
         return previous_picks
 
 
