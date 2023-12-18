@@ -38,7 +38,7 @@ def check_user_existence(user_id: str, db: Session = Depends(dependencies.get_db
 @unauthorized_router.post('', response_model=UserResponseFull)
 def create_user(user_create_input: UserCreate, db: Session = Depends(dependencies.get_db)):
     user_model = user_service.create(db, user_create_input)
-    if user_model.email in settings.ADMIN_EMAILS.split(","):
+    if user_model.email.lower() in settings.ADMIN_EMAILS.split(","):
         update_user_admin = UserUpdateAdmin(is_admin=True)
         user_service.update_user_admin(db, user_model, update_user_admin)
 

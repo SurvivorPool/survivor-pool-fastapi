@@ -74,6 +74,9 @@ def create_player_team(
         db: Session = Depends(dependencies.get_db),
         current_user: User = Depends(dependencies.get_current_user)
 ):
+    existing_teams = player_team_service.get_by_user_id(db, current_user.id)
+    if existing_teams.count() > 2 : 
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot add more than 3 teams per user")
     player_team_model = player_team_service.create_player_team(db, player_team_input, current_user)
     player_team_response = PlayerTeamResponseFull(
         id=player_team_model.id,
